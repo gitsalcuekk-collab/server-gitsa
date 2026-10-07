@@ -5,6 +5,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Anti Spam Rate-Limit sederhana
+const rateLimitMap = new Map();
+
 let laporanList = [
   {
     id: 1,
@@ -27,6 +30,15 @@ app.get('/', (req, res) => {
 app.get('/api/laporan', (req, res) => res.json(laporanList));
 
 app.post('/api/laporan', (req, res) => {
+  const ip = req.ip || 'user';
+  const now = Date.now();
+  const lastTime = rateLimitMap.get(ip) || 0;
+
+  if (now - lastTime < 5000) { // maksimal 1 laporan tiap 5 detik
+    return res.status(429).json({ message: 'Too many requests' });
+  }
+  rateLimitMap.set(ip, now);
+
   const { kategori, urgensi, pesan, foto } = req.body;
   const newLaporan = {
     id: Date.now(),
