@@ -12,7 +12,7 @@
   <nav class="bg-indigo-600 text-white shadow-lg">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <i class="fa-solid fa-user-shield text-2xl"></i>
+        <i class="fa-solid fa-graduation-cap text-2xl"></i>
         <h1 class="font-bold text-lg md:text-xl">Aspirasi SMK Walisongo 2 Gempol</h1>
       </div>
       <div>
@@ -56,7 +56,7 @@
           </div>
           <div>
             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Isi Laporan / Keluhan</label>
-            <textarea id="pesan" class="w-full border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" rows="4" required placeholder="Tuliskan keluhan atau saranmu secara jelas dan jujur... Identitasmu 100% rahasia!"></textarea>
+            <textarea id="pesan" class="w-full border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" rows="4" required placeholder="Tuliskan keluhan atau saranmu secara jelas... Identitasmu 100% rahasia!"></textarea>
           </div>
           <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-sm shadow transition">
             Kirim Aspirasi
@@ -74,7 +74,7 @@
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-user-gear text-indigo-600"></i> Panel Kelola Pengaduan (Guru)
+            <i class="fa-solid fa-user-gear text-indigo-600"></i> Panel Kelola Pengaduan (Guru/Admin)
           </h2>
           <span class="bg-indigo-100 text-indigo-700 text-xs px-3 py-1 rounded-full font-bold">Akses Admin</span>
         </div>
@@ -159,38 +159,4 @@
             '<div class="flex flex-col md:flex-row gap-2 pt-2 border-t border-slate-200">' +
               '<input type="text" id="reply-' + item.id + '" placeholder="Tulis balasan/tanggapan..." value="' + (item.tanggapan || '') + '" class="flex-1 border p-2 rounded text-xs">' +
               '<button onclick="updateStatus(' + item.id + ', \'Diproses\')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-xs font-bold">Set Diproses</button>' +
-              '<button onclick="updateStatus(' + item.id + ', \'Selesai\')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold">Set Selesai & Balas</button>' +
-            '</div>' +
-          '</div>';
-      });
-    }
-
-    document.getElementById('formPengaduan').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const kategori = document.getElementById('kategori').value;
-      const pesan = document.getElementById('pesan').value;
-
-      await fetch('/api/laporan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kategori, pesan })
-      });
-
-      document.getElementById('pesan').value = '';
-      loadData();
-    });
-
-    async function updateStatus(id, status) {
-      const tanggapan = document.getElementById('reply-' + id).value;
-      await fetch('/api/laporan/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status, tanggapan })
-      });
-      loadData();
-    }
-
-    loadData();
-  </script>
-</body>
-</html>
+              '<button onclick="updateStatus(' + item.id + ', \'Selesai\')" class="bg-emerald-600 hover:bg-
