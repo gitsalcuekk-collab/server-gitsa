@@ -12,6 +12,9 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans pb-12 transition-colors duration-200">
   
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
   <!-- Navbar -->
   <nav class="bg-indigo-600 dark:bg-indigo-900 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-3">
@@ -20,6 +23,7 @@
         <p class="text-xs text-indigo-200">Sistem Pengaduan & Aspirasi Siswa Digital</p>
       </div>
       <div class="flex items-center gap-2">
+        <button onclick="toggleModalFaq(true)" class="px-3 py-2 rounded-xl bg-indigo-700 dark:bg-indigo-800 text-xs font-bold hover:bg-indigo-800">❓ Panduan</button>
         <button id="themeToggle" class="p-2 rounded-xl bg-indigo-700 dark:bg-indigo-800 text-xs font-bold hover:bg-indigo-800">🌙 / ☀️</button>
         <button id="btnSiswa" class="px-3 py-2 rounded-xl bg-white text-indigo-600 font-bold text-xs md:text-sm shadow">Mode Siswa</button>
         <button id="btnAdmin" class="px-3 py-2 rounded-xl bg-indigo-700 text-indigo-100 font-bold text-xs md:text-sm hover:bg-indigo-800">Portal Guru / Admin</button>
@@ -103,6 +107,12 @@
             <option value="Selesai">Selesai</option>
             <option value="Ditolak">Ditolak</option>
           </select>
+          <select id="filterUrgensi" onchange="loadData()" class="border dark:border-slate-600 p-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-700 dark:text-white font-bold">
+            <option value="ALL">Semua Urgensi</option>
+            <option value="Biasa">Biasa</option>
+            <option value="Penting">Penting</option>
+            <option value="Sangat Mendesak">Sangat Mendesak</option>
+          </select>
         </div>
 
         <div id="daftarLaporanPublic" class="space-y-4"></div>
@@ -123,10 +133,11 @@
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 pb-4 border-b dark:border-slate-700">
           <div>
             <h2 class="text-lg font-bold text-slate-800 dark:text-white">Panel Kelola Pengaduan (Guru/Admin)</h2>
-            <p class="text-xs text-slate-500">Kelola status laporan, beri alasan/balasan, atau cetak rekap PDF.</p>
+            <p class="text-xs text-slate-500">Kelola status laporan, beri alasan/balasan, atau cetak rekap PDF/Excel.</p>
           </div>
-          <div class="flex gap-2">
-            <button onclick="window.print()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-indigo-700">🖨️ Cetak Laporan (PDF)</button>
+          <div class="flex flex-wrap gap-2">
+            <a href="/api/export/excel" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-emerald-700">📊 Download Excel</a>
+            <button onclick="window.print()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-indigo-700">🖨️ Cetak PDF</button>
             <button id="btnLogout" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-rose-100">Keluar Admin</button>
           </div>
         </div>
@@ -136,6 +147,23 @@
 
   </div>
 
+  <!-- Modal FAQ / Panduan -->
+  <div id="modalFaq" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 max-w-lg w-full p-6 rounded-2xl shadow-xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-3 dark:border-slate-700">
+        <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400">📖 Panduan Tata Cara Pengaduan</h3>
+        <button onclick="toggleModalFaq(false)" class="text-slate-400 font-black hover:text-slate-600">✕</button>
+      </div>
+      <div class="space-y-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+        <p><b>1. Identitas Rahasia:</b> Pengiriman aspirasi bersifat 100% anonim. Pihak sekolah tidak mencatat data pribadi siswa.</p>
+        <p><b>2. Gunakan Bahasa Sopan:</b> Isi pengaduan dengan jelas dan tidak mengandung unsur SARA atau kata-kata kotor.</p>
+        <p><b>3. Lampiran Foto:</b> Sertakan foto bukti jika pelaporan mengenai kerusakan fasilitas atau masalah fisik.</p>
+        <p><b>4. Kode Tiket (#ASP):</b> Simpan kode tiket aduanmu untuk melacak perkembangannya lewat kolom pencarian.</p>
+      </div>
+      <button onclick="toggleModalFaq(false)" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs">Paham, Tutup</button>
+    </div>
+  </div>
+
   <script>
     let currentMode = 'siswa';
     let uploadedBase64 = '';
@@ -143,6 +171,18 @@
 
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.onclick = () => document.documentElement.classList.toggle('dark');
+
+    function showToast(msg, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `px-4 py-3 rounded-xl text-xs font-bold text-white shadow-lg transition-all transform translate-y-2 ${type === 'error' ? 'bg-rose-600' : 'bg-indigo-600'}`;
+      toast.innerText = msg;
+      document.getElementById('toastContainer').appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function toggleModalFaq(show) {
+      document.getElementById('modalFaq').classList.toggle('hidden', !show);
+    }
 
     function handleFile(input) {
       const file = input.files[0];
@@ -183,15 +223,15 @@
       const pass = prompt('Masukkan Password Admin Guru:');
       if (pass === 'guru969') {
         showTab('admin');
-        alert('Berhasil masuk mode Admin!');
+        showToast('Berhasil masuk mode Admin!');
       } else if (pass !== null) {
-        alert('Password salah!');
+        showToast('Password salah!', 'error');
       }
     };
 
     btnLogout.onclick = () => {
       showTab('siswa');
-      alert('Anda kembali ke Mode Siswa.');
+      showToast('Anda kembali ke Mode Siswa.');
     };
 
     function showTab(mode) {
@@ -242,11 +282,13 @@
 
       const search = document.getElementById('searchInput').value.toLowerCase();
       const statusFilter = document.getElementById('filterStatus').value;
+      const urgensiFilter = document.getElementById('filterUrgensi').value;
 
       let filtered = data.filter(item => {
         const matchSearch = item.pesan.toLowerCase().includes(search) || item.kategori.toLowerCase().includes(search) || (item.ticket && item.ticket.toLowerCase().includes(search));
         const matchStatus = statusFilter === 'ALL' || item.status === statusFilter;
-        return matchSearch && matchStatus;
+        const matchUrgensi = urgensiFilter === 'ALL' || item.urgensi === urgensiFilter;
+        return matchSearch && matchStatus && matchUrgensi;
       });
 
       const publicContainer = document.getElementById('daftarLaporanPublic');
@@ -284,11 +326,12 @@
       adminContainer.innerHTML = '';
       data.forEach(item => {
         const fotoHtmlAdmin = item.foto ? '<div class="mt-2"><img src="' + item.foto + '" class="max-h-36 rounded-lg border"></div>' : '';
+        const newTag = item.isNew ? '<span class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">BARU</span>' : '';
 
         adminContainer.innerHTML += 
           '<div class="p-4 border dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700 space-y-3">' +
             '<div class="flex justify-between text-xs font-bold">' +
-              '<span class="text-indigo-600 dark:text-indigo-300">' + item.kategori + ' (' + item.ticket + ') - 👍 ' + (item.upvotes || 0) + ' Dukungan</span>' +
+              '<div class="flex items-center gap-2"><span class="text-indigo-600 dark:text-indigo-300">' + item.kategori + ' (' + item.ticket + ') - 👍 ' + (item.upvotes || 0) + ' Dukungan</span>' + newTag + '</div>' +
               '<span class="text-slate-400 font-normal">' + item.tanggal + '</span>' +
             '</div>' +
             '<p class="text-sm font-medium text-slate-800 dark:text-slate-100">' + item.pesan + '</p>' +
@@ -316,16 +359,17 @@
       });
 
       if (!res.ok) {
-        alert('Terlalu banyak mengirim laporan! Harap tunggu sebentar.');
+        showToast('Terlalu cepat! Tunggu 5 detik.', 'error');
         return;
       }
 
+      const json = await res.json();
       document.getElementById('pesan').value = '';
       document.getElementById('fotoInput').value = '';
       document.getElementById('fileName').innerText = 'Pilih Foto Dari HP';
       document.getElementById('previewContainer').classList.add('hidden');
       uploadedBase64 = '';
-      alert('Laporan berhasil dikirim!');
+      showToast('Laporan berhasil dikirim! Kode Tiket: ' + json.ticket);
       loadData();
     };
 
@@ -335,6 +379,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
       });
+      showToast('Dukungan (+1) ditambahkan!');
       loadData();
     }
 
@@ -345,7 +390,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status, tanggapan })
       });
-      alert('Status laporan diperbarui!');
+      showToast('Status aduan diperbarui!');
       loadData();
     }
 
@@ -356,7 +401,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id })
         });
-        alert('Aduan berhasil dihapus!');
+        showToast('Aduan berhasil dihapus!');
         loadData();
       }
     }
