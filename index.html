@@ -5,28 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aspirasi SMK Walisongo 2 Gempol</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 font-sans pb-12">
   
+  <!-- Navbar -->
   <nav class="bg-indigo-600 text-white shadow-lg sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
-      <div class="flex items-center space-x-3">
-        <div class="bg-white/10 p-2 rounded-xl">
-          <i class="fa-solid fa-graduation-cap text-2xl text-amber-300"></i>
-        </div>
-        <div>
-          <h1 class="font-extrabold text-lg md:text-xl tracking-tight">Aspirasi SMK Walisongo 2 Gempol</h1>
-          <p class="text-xs text-indigo-200">Sistem Layanan Pengaduan & Aspirasi Anonim Siswa</p>
-        </div>
-      </div>
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="font-extrabold text-lg md:text-xl">Aspirasi SMK Walisongo 2 Gempol</h1>
       <div class="flex items-center gap-2">
-        <button onclick="switchTab('siswa')" id="btnSiswa" class="px-4 py-2 rounded-xl bg-white text-indigo-600 font-bold text-sm shadow transition hover:bg-slate-50">
-          <i class="fa-solid fa-user-graduate mr-1.5"></i> Mode Siswa
+        <button id="btnSiswa" class="px-4 py-2 rounded-xl bg-white text-indigo-600 font-bold text-sm shadow">
+          Mode Siswa
         </button>
-        <button onclick="openLoginModal()" id="btnAdmin" class="px-4 py-2 rounded-xl bg-indigo-700 text-indigo-100 hover:bg-indigo-800 font-bold text-sm transition">
-          <i class="fa-solid fa-user-shield mr-1.5"></i> Portal Guru / Admin
+        <button id="btnAdmin" class="px-4 py-2 rounded-xl bg-indigo-700 text-indigo-100 font-bold text-sm hover:bg-indigo-800">
+          Portal Guru / Admin
         </button>
       </div>
     </div>
@@ -34,46 +25,30 @@
 
   <div class="max-w-6xl mx-auto p-4 md:p-6">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
-        <div>
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Aspirasi</p>
-          <p id="statTotal" class="text-3xl font-black text-indigo-600">0</p>
-        </div>
-        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
-          <i class="fa-solid fa-inbox text-xl"></i>
-        </div>
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-3 gap-4 mb-8 text-center">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border">
+        <p class="text-xs font-bold text-slate-400 uppercase">Total Aspirasi</p>
+        <p id="statTotal" class="text-3xl font-black text-indigo-600">0</p>
       </div>
-      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
-        <div>
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Sedang Diproses</p>
-          <p id="statProses" class="text-3xl font-black text-amber-500">0</p>
-        </div>
-        <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500">
-          <i class="fa-solid fa-spinner fa-spin-pulse text-xl"></i>
-        </div>
+      <div class="bg-white p-4 rounded-2xl shadow-sm border">
+        <p class="text-xs font-bold text-slate-400 uppercase">Sedang Diproses</p>
+        <p id="statProses" class="text-3xl font-black text-amber-500">0</p>
       </div>
-      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
-        <div>
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tuntas & Selesai</p>
-          <p id="statSelesai" class="text-3xl font-black text-emerald-500">0</p>
-        </div>
-        <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
-          <i class="fa-solid fa-circle-check text-xl"></i>
-        </div>
+      <div class="bg-white p-4 rounded-2xl shadow-sm border">
+        <p class="text-xs font-bold text-slate-400 uppercase">Tuntas & Selesai</p>
+        <p id="statSelesai" class="text-3xl font-black text-emerald-500">0</p>
       </div>
     </div>
 
+    <!-- SISWA VIEW -->
     <div id="viewSiswa" class="grid md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 md:col-span-1 h-fit sticky top-24">
-        <div class="flex items-center gap-2 mb-4 text-indigo-600">
-          <i class="fa-solid fa-paper-plane text-lg"></i>
-          <h2 class="text-base font-bold">Kirim Aspirasi Anonim</h2>
-        </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border md:col-span-1 h-fit">
+        <h2 class="text-base font-bold text-indigo-600 mb-4">Kirim Aspirasi Anonim</h2>
         <form id="formPengaduan" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Kategori Pelaporan</label>
-            <select id="kategori" class="w-full border border-slate-200 bg-slate-50 p-3 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Kategori Pelaporan</label>
+            <select id="kategori" class="w-full border p-3 rounded-xl text-sm bg-slate-50">
               <option value="Fasilitas Sekolah">Fasilitas Sekolah</option>
               <option value="Keamanan & Bullying">Keamanan & Bullying</option>
               <option value="Akademik & Guru">Akademik & Guru</option>
@@ -81,32 +56,153 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Isi Laporan / Keluhan</label>
-            <textarea id="pesan" class="w-full border border-slate-200 bg-slate-50 p-3 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition" rows="4" required placeholder="Tuliskan keluhan atau saranmu secara spesifik. Identitas kamu 100% rahasia!"></textarea>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Isi Laporan / Keluhan</label>
+            <textarea id="pesan" class="w-full border p-3 rounded-xl text-sm bg-slate-50" rows="4" required placeholder="Tuliskan keluhan atau saranmu..."></textarea>
           </div>
-          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold py-3 rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-paper-plane"></i> Kirim Laporan Sekarang
+          <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm shadow">
+            Kirim Laporan
           </button>
         </form>
       </div>
 
       <div class="md:col-span-2">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-base font-bold text-slate-700">Daftar Aspirasi Publik</h2>
-          <select id="filterKategori" onchange="loadData()" class="border border-slate-200 bg-white px-3 py-1.5 rounded-xl text-xs font-semibold outline-none">
-            <option value="ALL">Semua Kategori</option>
-            <option value="Fasilitas Sekolah">Fasilitas Sekolah</option>
-            <option value="Keamanan & Bullying">Keamanan & Bullying</option>
-            <option value="Akademik & Guru">Akademik & Guru</option>
-            <option value="Saran & Masukan">Saran & Masukan</option>
-          </select>
-        </div>
+        <h2 class="text-base font-bold text-slate-700 mb-4">Daftar Aspirasi Terbaru</h2>
         <div id="daftarLaporanPublic" class="space-y-4"></div>
       </div>
     </div>
 
+    <!-- ADMIN VIEW -->
     <div id="viewAdmin" class="hidden">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
-        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-6 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-lg font-bold text-
+      <div class="bg-white p-6 rounded-2xl shadow-sm border">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b">
+          <h2 class="text-lg font-bold text-slate-800">Panel Kelola Pengaduan (Guru/Admin)</h2>
+          <button id="btnLogout" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-bold">Keluar Admin</button>
+        </div>
+        <div id="daftarLaporanAdmin" class="space-y-4"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentMode = 'siswa';
+
+    const btnSiswa = document.getElementById('btnSiswa');
+    const btnAdmin = document.getElementById('btnAdmin');
+    const btnLogout = document.getElementById('btnLogout');
+    const viewSiswa = document.getElementById('viewSiswa');
+    const viewAdmin = document.getElementById('viewAdmin');
+
+    btnSiswa.onclick = () => showTab('siswa');
+    
+    btnAdmin.onclick = () => {
+      if (currentMode === 'admin') return;
+      const pass = prompt('Masukkan Password Admin Guru:');
+      if (pass === 'guru123') {
+        showTab('admin');
+        alert('Berhasil masuk mode Admin!');
+      } else if (pass !== null) {
+        alert('Password salah! Password default: guru123');
+      }
+    };
+
+    btnLogout.onclick = () => {
+      showTab('siswa');
+      alert('Anda kembali ke Mode Siswa.');
+    };
+
+    function showTab(mode) {
+      currentMode = mode;
+      if (mode === 'siswa') {
+        viewSiswa.classList.remove('hidden');
+        viewAdmin.classList.add('hidden');
+        btnSiswa.className = "px-4 py-2 rounded-xl bg-white text-indigo-600 font-bold text-sm shadow";
+        btnAdmin.className = "px-4 py-2 rounded-xl bg-indigo-700 text-indigo-100 font-bold text-sm hover:bg-indigo-800";
+      } else {
+        viewSiswa.classList.add('hidden');
+        viewAdmin.classList.remove('hidden');
+        btnAdmin.className = "px-4 py-2 rounded-xl bg-white text-indigo-600 font-bold text-sm shadow";
+        btnSiswa.className = "px-4 py-2 rounded-xl bg-indigo-700 text-indigo-100 font-bold text-sm hover:bg-indigo-800";
+      }
+      loadData();
+    }
+
+    async function loadData() {
+      const res = await fetch('/api/laporan');
+      const data = await res.json();
+
+      document.getElementById('statTotal').innerText = data.length;
+      document.getElementById('statProses').innerText = data.filter(i => i.status === 'Diproses').length;
+      document.getElementById('statSelesai').innerText = data.filter(i => i.status === 'Selesai').length;
+
+      const publicContainer = document.getElementById('daftarLaporanPublic');
+      publicContainer.innerHTML = '';
+      data.forEach(item => {
+        const badge = item.status === 'Selesai' 
+          ? '<span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">Selesai</span>'
+          : '<span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">Diproses</span>';
+
+        const tanggapan = item.tanggapan ? 
+          '<div class="mt-3 p-3 bg-slate-50 border-l-4 border-indigo-500 text-xs text-slate-600"><b>Tanggapan Sekolah:</b> ' + item.tanggapan + '</div>' : '';
+
+        publicContainer.innerHTML += 
+          '<div class="bg-white p-5 rounded-2xl border">' +
+            '<div class="flex justify-between items-center mb-2">' +
+              '<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">' + item.kategori + '</span>' +
+              badge +
+            '</div>' +
+            '<p class="text-slate-800 text-sm my-2">' + item.pesan + '</p>' +
+            tanggapan +
+            '<div class="text-right text-[11px] text-slate-400 mt-2">' + item.tanggal + '</div>' +
+          '</div>';
+      });
+
+      const adminContainer = document.getElementById('daftarLaporanAdmin');
+      adminContainer.innerHTML = '';
+      data.forEach(item => {
+        adminContainer.innerHTML += 
+          '<div class="p-4 border rounded-xl bg-slate-50 space-y-3">' +
+            '<div class="flex justify-between text-xs text-indigo-600 font-bold">' +
+              '<span>' + item.kategori + '</span>' +
+              '<span class="text-slate-400 font-normal">' + item.tanggal + '</span>' +
+            '</div>' +
+            '<p class="text-sm font-medium text-slate-800">' + item.pesan + '</p>' +
+            '<div class="flex gap-2">' +
+              '<input type="text" id="reply-' + item.id + '" placeholder="Tulis tanggapan sekolah..." value="' + (item.tanggapan || '') + '" class="flex-1 border p-2 rounded text-xs">' +
+              '<button onclick="updateStatus(' + item.id + ', \'Selesai\')" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold">Simpan & Selesai</button>' +
+            '</div>' +
+          '</div>';
+      });
+    }
+
+    document.getElementById('formPengaduan').onsubmit = async (e) => {
+      e.preventDefault();
+      const kategori = document.getElementById('kategori').value;
+      const pesan = document.getElementById('pesan').value;
+
+      await fetch('/api/laporan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kategori, pesan })
+      });
+
+      document.getElementById('pesan').value = '';
+      alert('Laporan berhasil dikirim!');
+      loadData();
+    };
+
+    async function updateStatus(id, status) {
+      const tanggapan = document.getElementById('reply-' + id).value;
+      await fetch('/api/laporan/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, tanggapan })
+      });
+      alert('Status & Tanggapan diperbarui!');
+      loadData();
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
