@@ -11,7 +11,10 @@
   <!-- Navbar -->
   <nav class="bg-indigo-600 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="font-extrabold text-lg md:text-xl">Aspirasi SMK Walisongo 2 Gempol</h1>
+      <div>
+        <h1 class="font-extrabold text-lg md:text-xl">Aspirasi SMK Walisongo 2 Gempol</h1>
+        <p class="text-xs text-indigo-200">Layanan Pengaduan & Aspirasi Siswa</p>
+      </div>
       <div class="flex items-center gap-2">
         <button id="btnSiswa" class="px-4 py-2 rounded-xl bg-white text-indigo-600 font-bold text-sm shadow">
           Mode Siswa
@@ -26,18 +29,22 @@
   <div class="max-w-6xl mx-auto p-4 md:p-6">
 
     <!-- Stat Cards -->
-    <div class="grid grid-cols-3 gap-4 mb-8 text-center">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
       <div class="bg-white p-4 rounded-2xl shadow-sm border">
         <p class="text-xs font-bold text-slate-400 uppercase">Total Aspirasi</p>
-        <p id="statTotal" class="text-3xl font-black text-indigo-600">0</p>
+        <p id="statTotal" class="text-2xl font-black text-indigo-600">0</p>
       </div>
       <div class="bg-white p-4 rounded-2xl shadow-sm border">
-        <p class="text-xs font-bold text-slate-400 uppercase">Sedang Diproses</p>
-        <p id="statProses" class="text-3xl font-black text-amber-500">0</p>
+        <p class="text-xs font-bold text-slate-400 uppercase">Diproses</p>
+        <p id="statProses" class="text-2xl font-black text-amber-500">0</p>
       </div>
       <div class="bg-white p-4 rounded-2xl shadow-sm border">
-        <p class="text-xs font-bold text-slate-400 uppercase">Tuntas & Selesai</p>
-        <p id="statSelesai" class="text-3xl font-black text-emerald-500">0</p>
+        <p class="text-xs font-bold text-slate-400 uppercase">Selesai</p>
+        <p id="statSelesai" class="text-2xl font-black text-emerald-500">0</p>
+      </div>
+      <div class="bg-white p-4 rounded-2xl shadow-sm border">
+        <p class="text-xs font-bold text-slate-400 uppercase">Ditolak</p>
+        <p id="statDitolak" class="text-2xl font-black text-rose-500">0</p>
       </div>
     </div>
 
@@ -47,8 +54,8 @@
         <h2 class="text-base font-bold text-indigo-600 mb-4">Kirim Aspirasi Anonim</h2>
         <form id="formPengaduan" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Kategori Pelaporan</label>
-            <select id="kategori" class="w-full border p-3 rounded-xl text-sm bg-slate-50">
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Kategori</label>
+            <select id="kategori" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50">
               <option value="Fasilitas Sekolah">Fasilitas Sekolah</option>
               <option value="Keamanan & Bullying">Keamanan & Bullying</option>
               <option value="Akademik & Guru">Akademik & Guru</option>
@@ -56,10 +63,22 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Isi Laporan / Keluhan</label>
-            <textarea id="pesan" class="w-full border p-3 rounded-xl text-sm bg-slate-50" rows="4" required placeholder="Tuliskan keluhan atau saranmu..."></textarea>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tingkat Urgensi</label>
+            <select id="urgensi" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50">
+              <option value="Biasa">Biasa</option>
+              <option value="Penting">Penting</option>
+              <option value="Sangat Mendesak">Sangat Mendesak</option>
+            </select>
           </div>
-          <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm shadow">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Isi Laporan / Keluhan</label>
+            <textarea id="pesan" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50" rows="3" required placeholder="Tuliskan keluhan atau saranmu..."></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Link Foto Bukti (Opsional)</label>
+            <input type="url" id="foto" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50" placeholder="https://i.imgur.com/...">
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm shadow hover:bg-indigo-700">
             Kirim Laporan
           </button>
         </form>
@@ -75,8 +94,11 @@
     <div id="viewAdmin" class="hidden">
       <div class="bg-white p-6 rounded-2xl shadow-sm border">
         <div class="flex justify-between items-center mb-6 pb-4 border-b">
-          <h2 class="text-lg font-bold text-slate-800">Panel Kelola Pengaduan (Guru/Admin)</h2>
-          <button id="btnLogout" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-bold">Keluar Admin</button>
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">Panel Kelola Pengaduan (Guru/Admin)</h2>
+            <p class="text-xs text-slate-500">Kelola status laporan, beri alasan/balasan, atau hapus aduan.</p>
+          </div>
+          <button id="btnLogout" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-rose-100">Keluar Admin</button>
         </div>
         <div id="daftarLaporanAdmin" class="space-y-4"></div>
       </div>
@@ -98,11 +120,11 @@
     btnAdmin.onclick = () => {
       if (currentMode === 'admin') return;
       const pass = prompt('Masukkan Password Admin Guru:');
-      if (pass === 'guru123') {
+      if (pass === 'guru969') {
         showTab('admin');
         alert('Berhasil masuk mode Admin!');
       } else if (pass !== null) {
-        alert('Password salah! Password default: guru123');
+        alert('Password salah!');
       }
     };
 
@@ -134,24 +156,34 @@
       document.getElementById('statTotal').innerText = data.length;
       document.getElementById('statProses').innerText = data.filter(i => i.status === 'Diproses').length;
       document.getElementById('statSelesai').innerText = data.filter(i => i.status === 'Selesai').length;
+      document.getElementById('statDitolak').innerText = data.filter(i => i.status === 'Ditolak').length;
 
       const publicContainer = document.getElementById('daftarLaporanPublic');
       publicContainer.innerHTML = '';
       data.forEach(item => {
-        const badge = item.status === 'Selesai' 
-          ? '<span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">Selesai</span>'
-          : '<span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">Diproses</span>';
+        let badge = '<span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">Diproses</span>';
+        if (item.status === 'Selesai') badge = '<span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">Selesai</span>';
+        if (item.status === 'Ditolak') badge = '<span class="bg-rose-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full">Ditolak</span>';
+
+        let urgensiBadge = '<span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">' + (item.urgensi || 'Biasa') + '</span>';
+        if (item.urgensi === 'Sangat Mendesak') urgensiBadge = '<span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">Sangat Mendesak</span>';
 
         const tanggapan = item.tanggapan ? 
-          '<div class="mt-3 p-3 bg-slate-50 border-l-4 border-indigo-500 text-xs text-slate-600"><b>Tanggapan Sekolah:</b> ' + item.tanggapan + '</div>' : '';
+          '<div class="mt-3 p-3 bg-slate-50 border-l-4 ' + (item.status === 'Ditolak' ? 'border-rose-500' : 'border-indigo-500') + ' text-xs text-slate-600"><b>' + (item.status === 'Ditolak' ? 'Alasan Penolakan:' : 'Tanggapan Sekolah:') + '</b> ' + item.tanggapan + '</div>' : '';
+
+        const fotoHtml = item.foto ? '<div class="mt-2"><a href="' + item.foto + '" target="_blank" class="text-xs text-indigo-600 underline font-semibold">Lihat Lampiran Foto</a></div>' : '';
 
         publicContainer.innerHTML += 
-          '<div class="bg-white p-5 rounded-2xl border">' +
+          '<div class="bg-white p-5 rounded-2xl border shadow-sm">' +
             '<div class="flex justify-between items-center mb-2">' +
-              '<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">' + item.kategori + '</span>' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">' + item.kategori + '</span>' +
+                urgensiBadge +
+              '</div>' +
               badge +
             '</div>' +
             '<p class="text-slate-800 text-sm my-2">' + item.pesan + '</p>' +
+            fotoHtml +
             tanggapan +
             '<div class="text-right text-[11px] text-slate-400 mt-2">' + item.tanggal + '</div>' +
           '</div>';
@@ -162,14 +194,16 @@
       data.forEach(item => {
         adminContainer.innerHTML += 
           '<div class="p-4 border rounded-xl bg-slate-50 space-y-3">' +
-            '<div class="flex justify-between text-xs text-indigo-600 font-bold">' +
-              '<span>' + item.kategori + '</span>' +
+            '<div class="flex justify-between text-xs font-bold">' +
+              '<span class="text-indigo-600">' + item.kategori + ' (' + (item.urgensi || 'Biasa') + ')</span>' +
               '<span class="text-slate-400 font-normal">' + item.tanggal + '</span>' +
             '</div>' +
             '<p class="text-sm font-medium text-slate-800">' + item.pesan + '</p>' +
-            '<div class="flex gap-2">' +
-              '<input type="text" id="reply-' + item.id + '" placeholder="Tulis tanggapan sekolah..." value="' + (item.tanggapan || '') + '" class="flex-1 border p-2 rounded text-xs">' +
-              '<button onclick="updateStatus(' + item.id + ', \'Selesai\')" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold">Simpan & Selesai</button>' +
+            '<div class="flex flex-col md:flex-row gap-2">' +
+              '<input type="text" id="reply-' + item.id + '" placeholder="Tulis balasan / alasan penolakan..." value="' + (item.tanggapan || '') + '" class="flex-1 border p-2 rounded text-xs">' +
+              '<button onclick="updateStatus(' + item.id + ', \'Selesai\')" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-emerald-700">Set Selesai</button>' +
+              '<button onclick="updateStatus(' + item.id + ', \'Ditolak\')" class="bg-rose-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-rose-700">Tolak Aspirasi</button>' +
+              '<button onclick="deleteLaporan(' + item.id + ')" class="bg-slate-700 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-slate-800">Hapus</button>' +
             '</div>' +
           '</div>';
       });
@@ -178,15 +212,18 @@
     document.getElementById('formPengaduan').onsubmit = async (e) => {
       e.preventDefault();
       const kategori = document.getElementById('kategori').value;
+      const urgensi = document.getElementById('urgensi').value;
       const pesan = document.getElementById('pesan').value;
+      const foto = document.getElementById('foto').value;
 
       await fetch('/api/laporan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kategori, pesan })
+        body: JSON.stringify({ kategori, urgensi, pesan, foto })
       });
 
       document.getElementById('pesan').value = '';
+      document.getElementById('foto').value = '';
       alert('Laporan berhasil dikirim!');
       loadData();
     };
@@ -198,8 +235,20 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status, tanggapan })
       });
-      alert('Status & Tanggapan diperbarui!');
+      alert('Status laporan diperbarui!');
       loadData();
+    }
+
+    async function deleteLaporan(id) {
+      if (confirm('Yakin ingin menghapus aduan ini dari daftar?')) {
+        await fetch('/api/laporan/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        alert('Aduan berhasil dihapus!');
+        loadData();
+      }
     }
 
     loadData();
