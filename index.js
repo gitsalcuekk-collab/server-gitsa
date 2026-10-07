@@ -8,9 +8,8 @@ let laporanList = [
   {
     id: 1,
     kategori: 'Fasilitas Sekolah',
-    pesan: 'AC di kelas 11 IPA 2 bocor dan berisik banget pak/bu.',
+    pesan: 'AC kelas kurang dingin pak/bu.',
     status: 'Diproses',
-    tanggapan: 'Terima kasih, tim sarpras akan mengecek lokasi besok.',
     tanggal: '07/10/2026, 10:15:00'
   }
 ];
@@ -22,49 +21,77 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Portal Pengaduan & Aspirasi Siswa</title>
+      <title>Aspirasi SMK Walisongo 2 Gempol</title>
       <script src="https://cdn.tailwindcss.com"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
-    <body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
-      
-      <nav class="bg-indigo-600 text-white shadow-lg">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div class="flex items-center space-x-3">
-            <i class="fa-solid me-2 fa-user-shield text-2xl"></i>
-            <h1 class="font-bold text-lg md:text-xl">AspirasiSiswa.id</h1>
-          </div>
-          <div>
-            <button onclick="switchTab('siswa')" id="btnSiswa" class="px-3 py-1.5 rounded-lg bg-white text-indigo-600 font-semibold text-sm mr-2 shadow">Mode Siswa</button>
-            <button onclick="switchTab('admin')" id="btnAdmin" class="px-3 py-1.5 rounded-lg bg-indigo-700 hover:bg-indigo-800 text-white font-semibold text-sm">Portal Guru/Admin</button>
-          </div>
-        </div>
-      </nav>
+    <body class="bg-slate-100 p-6">
+      <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md">
+        <h1 class="text-xl font-bold text-indigo-600 mb-4 text-center">Aspirasi SMK Walisongo 2 Gempol</h1>
+        
+        <form id="formP" class="space-y-3 mb-6">
+          <select id="kategori" class="w-full border p-2 rounded text-sm">
+            <option value="Fasilitas Sekolah">Fasilitas Sekolah</option>
+            <option value="Keamanan & Bullying">Keamanan & Bullying</option>
+            <option value="Saran & Masukan">Saran & Masukan</option>
+          </select>
+          <textarea id="pesan" class="w-full border p-2 rounded text-sm" placeholder="Tuliskan aspirasimu..." required></textarea>
+          <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded text-sm font-bold">Kirim Aspirasi</button>
+        </form>
 
-      <div class="max-w-5xl mx-auto p-4 md:p-6">
+        <h2 class="font-bold text-slate-700 mb-2">Daftar Laporan:</h2>
+        <div id="list" class="space-y-2"></div>
+      </div>
 
-        <div class="grid grid-cols-3 gap-4 mb-6">
-          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 uppercase font-semibold">Total Laporan</p>
-            <p id="statTotal" class="text-2xl font-extrabold text-indigo-600">0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 uppercase font-semibold">Sedang Diproses</p>
-            <p id="statProses" class="text-2xl font-extrabold text-amber-500">0</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-            <p class="text-xs text-slate-500 uppercase font-semibold">Selesai</p>
-            <p id="statSelesai" class="text-2xl font-extrabold text-emerald-500">0</p>
-          </div>
-        </div>
+      <script>
+        async function load() {
+          const res = await fetch('/api/laporan');
+          const data = await res.json();
+          const list = document.getElementById('list');
+          list.innerHTML = '';
+          data.forEach(i => {
+            list.innerHTML += \`
+              <div class="p-3 bg-slate-50 border rounded text-xs">
+                <div class="font-bold text-indigo-600">\${i.kategori} <span class="text-slate-400 font-normal">(\${i.tanggal})</span></div>
+                <p class="mt-1">\${i.pesan}</p>
+              </div>
+            \`;
+          });
+        }
 
-        <div id="viewSiswa" class="grid md:grid-cols-3 gap-6">
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 md:col-span-1 h-fit">
-            <h2 class="text-lg font-bold mb-4 text-indigo-600 flex items-center gap-2">
-              <i class="fa-solid fa-paper-plane"></i> Kirim Laporan Anonim
-            </h2>
-            <form id="formPengaduan" class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Kategori</label>
-                <select id="kategori" class="w-full border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                  <option value="Fasilitas Sekolah">Fas
+        document.getElementById('formP').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const kategori = document.getElementById('kategori').value;
+          const pesan = document.getElementById('pesan').value;
+          await fetch('/api/laporan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kategori, pesan })
+          });
+          document.getElementById('pesan').value = '';
+          load();
+        });
+
+        load();
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+app.get('/api/laporan', (req, res) => res.json(laporanList));
+
+app.post('/api/laporan', (req, res) => {
+  const { kategori, pesan } = req.body;
+  const newLaporan = {
+    id: Date.now(),
+    kategori,
+    pesan,
+    status: 'Diproses',
+    tanggal: new Date().toLocaleString('id-ID')
+  };
+  laporanList.unshift(newLaporan);
+  res.json({ message: 'Success' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
