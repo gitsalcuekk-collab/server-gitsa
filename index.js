@@ -9,9 +9,11 @@ let laporanList = [
   {
     id: 1,
     kategori: 'Fasilitas Sekolah',
+    urgensi: 'Penting',
     pesan: 'Proyektor di kelas 11 RPL mati total saat jam pelajaran.',
     status: 'Diproses',
     tanggapan: 'Terima kasih, teknisi sarpras akan mengecek ke lokasi hari ini.',
+    foto: '',
     tanggal: '07/10/2026, 08:30:00'
   }
 ];
@@ -23,11 +25,13 @@ app.get('/', (req, res) => {
 app.get('/api/laporan', (req, res) => res.json(laporanList));
 
 app.post('/api/laporan', (req, res) => {
-  const { kategori, pesan } = req.body;
+  const { kategori, urgensi, pesan, foto } = req.body;
   const newLaporan = {
     id: Date.now(),
     kategori,
+    urgensi: urgensi || 'Biasa',
     pesan,
+    foto: foto || '',
     status: 'Diproses',
     tanggapan: '',
     tanggal: new Date().toLocaleString('id-ID')
