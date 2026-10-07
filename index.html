@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aspirasi SMK Walisongo 2 Gempol</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = { darkMode: 'class' }
   </script>
@@ -109,7 +110,15 @@
     </div>
 
     <!-- ADMIN VIEW -->
-    <div id="viewAdmin" class="hidden">
+    <div id="viewAdmin" class="hidden space-y-6">
+      <!-- Chart Dashboard -->
+      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border dark:border-slate-700">
+        <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">📊 Grafik Statistik Kategori Laporan</h3>
+        <div class="max-w-md mx-auto">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
       <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border dark:border-slate-700">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 pb-4 border-b dark:border-slate-700">
           <div>
@@ -130,6 +139,7 @@
   <script>
     let currentMode = 'siswa';
     let uploadedBase64 = '';
+    let chartInstance = null;
 
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.onclick = () => document.documentElement.classList.toggle('dark');
@@ -196,6 +206,29 @@
       loadData();
     }
 
+    function renderChart(data) {
+      const categories = ['Fasilitas Sekolah', 'Keamanan & Bullying', 'Akademik & Guru', 'Saran & Masukan'];
+      const counts = categories.map(cat => data.filter(item => item.kategori === cat).length);
+
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: categories,
+          datasets: [{
+            data: counts,
+            backgroundColor: ['#6366f1', '#f59e0b', '#10b981', '#ef4444']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
     async function loadData() {
       const res = await fetch('/api/laporan');
       const data = await res.json();
@@ -204,6 +237,8 @@
       document.getElementById('statProses').innerText = data.filter(i => i.status === 'Diproses').length;
       document.getElementById('statSelesai').innerText = data.filter(i => i.status === 'Selesai').length;
       document.getElementById('statDitolak').innerText = data.filter(i => i.status === 'Ditolak').length;
+
+      if (currentMode === 'admin') renderChart(data);
 
       const search = document.getElementById('searchInput').value.toLowerCase();
       const statusFilter = document.getElementById('filterStatus').value;
@@ -274,11 +309,16 @@
       const urgensi = document.getElementById('urgensi').value;
       const pesan = document.getElementById('pesan').value;
 
-      await fetch('/api/laporan', {
+      const res = await fetch('/api/laporan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kategori, urgensi, pesan, foto: uploadedBase64 })
       });
+
+      if (!res.ok) {
+        alert('Terlalu banyak mengirim laporan! Harap tunggu sebentar.');
+        return;
+      }
 
       document.getElementById('pesan').value = '';
       document.getElementById('fotoInput').value = '';
