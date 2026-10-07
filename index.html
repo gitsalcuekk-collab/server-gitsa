@@ -74,10 +74,16 @@
             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Isi Laporan / Keluhan</label>
             <textarea id="pesan" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50" rows="3" required placeholder="Tuliskan keluhan atau saranmu..."></textarea>
           </div>
+          
+          <!-- Tombol Upload File HP / Android -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Link Foto Bukti (Opsional)</label>
-            <input type="url" id="foto" class="w-full border p-2.5 rounded-xl text-sm bg-slate-50" placeholder="https://i.imgur.com/...">
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Lampiran Foto Bukti (Opsional)</label>
+            <label for="fotoInput" class="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-indigo-300 rounded-xl bg-indigo-50/50 text-indigo-600 text-xs font-bold cursor-pointer hover:bg-indigo-100 transition">
+              <span class="text-lg font-black">+</span> <span id="fileName">Ambil Kamera / Galeri HP</span>
+            </label>
+            <input type="file" id="fotoInput" accept="image/*" class="hidden" onchange="handleFile(this)">
           </div>
+
           <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm shadow hover:bg-indigo-700">
             Kirim Laporan
           </button>
@@ -96,7 +102,7 @@
         <div class="flex justify-between items-center mb-6 pb-4 border-b">
           <div>
             <h2 class="text-lg font-bold text-slate-800">Panel Kelola Pengaduan (Guru/Admin)</h2>
-            <p class="text-xs text-slate-500">Kelola status laporan, beri alasan/balasan, atau hapus aduan.</p>
+            <p class="text-xs text-slate-500">Hapus laporan spam, kelola status aduan, atau beri balasan.</p>
           </div>
           <button id="btnLogout" class="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-rose-100">Keluar Admin</button>
         </div>
@@ -108,12 +114,25 @@
 
   <script>
     let currentMode = 'siswa';
+    let uploadedBase64 = '';
 
     const btnSiswa = document.getElementById('btnSiswa');
     const btnAdmin = document.getElementById('btnAdmin');
     const btnLogout = document.getElementById('btnLogout');
     const viewSiswa = document.getElementById('viewSiswa');
     const viewAdmin = document.getElementById('viewAdmin');
+
+    function handleFile(input) {
+      const file = input.files[0];
+      if (file) {
+        document.getElementById('fileName').innerText = file.name;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedBase64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
 
     btnSiswa.onclick = () => showTab('siswa');
     
@@ -169,89 +188,4 @@
         if (item.urgensi === 'Sangat Mendesak') urgensiBadge = '<span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">Sangat Mendesak</span>';
 
         const tanggapan = item.tanggapan ? 
-          '<div class="mt-3 p-3 bg-slate-50 border-l-4 ' + (item.status === 'Ditolak' ? 'border-rose-500' : 'border-indigo-500') + ' text-xs text-slate-600"><b>' + (item.status === 'Ditolak' ? 'Alasan Penolakan:' : 'Tanggapan Sekolah:') + '</b> ' + item.tanggapan + '</div>' : '';
-
-        const fotoHtml = item.foto ? '<div class="mt-2"><a href="' + item.foto + '" target="_blank" class="text-xs text-indigo-600 underline font-semibold">Lihat Lampiran Foto</a></div>' : '';
-
-        publicContainer.innerHTML += 
-          '<div class="bg-white p-5 rounded-2xl border shadow-sm">' +
-            '<div class="flex justify-between items-center mb-2">' +
-              '<div class="flex items-center gap-2">' +
-                '<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">' + item.kategori + '</span>' +
-                urgensiBadge +
-              '</div>' +
-              badge +
-            '</div>' +
-            '<p class="text-slate-800 text-sm my-2">' + item.pesan + '</p>' +
-            fotoHtml +
-            tanggapan +
-            '<div class="text-right text-[11px] text-slate-400 mt-2">' + item.tanggal + '</div>' +
-          '</div>';
-      });
-
-      const adminContainer = document.getElementById('daftarLaporanAdmin');
-      adminContainer.innerHTML = '';
-      data.forEach(item => {
-        adminContainer.innerHTML += 
-          '<div class="p-4 border rounded-xl bg-slate-50 space-y-3">' +
-            '<div class="flex justify-between text-xs font-bold">' +
-              '<span class="text-indigo-600">' + item.kategori + ' (' + (item.urgensi || 'Biasa') + ')</span>' +
-              '<span class="text-slate-400 font-normal">' + item.tanggal + '</span>' +
-            '</div>' +
-            '<p class="text-sm font-medium text-slate-800">' + item.pesan + '</p>' +
-            '<div class="flex flex-col md:flex-row gap-2">' +
-              '<input type="text" id="reply-' + item.id + '" placeholder="Tulis balasan / alasan penolakan..." value="' + (item.tanggapan || '') + '" class="flex-1 border p-2 rounded text-xs">' +
-              '<button onclick="updateStatus(' + item.id + ', \'Selesai\')" class="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-emerald-700">Set Selesai</button>' +
-              '<button onclick="updateStatus(' + item.id + ', \'Ditolak\')" class="bg-rose-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-rose-700">Tolak Aspirasi</button>' +
-              '<button onclick="deleteLaporan(' + item.id + ')" class="bg-slate-700 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-slate-800">Hapus</button>' +
-            '</div>' +
-          '</div>';
-      });
-    }
-
-    document.getElementById('formPengaduan').onsubmit = async (e) => {
-      e.preventDefault();
-      const kategori = document.getElementById('kategori').value;
-      const urgensi = document.getElementById('urgensi').value;
-      const pesan = document.getElementById('pesan').value;
-      const foto = document.getElementById('foto').value;
-
-      await fetch('/api/laporan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kategori, urgensi, pesan, foto })
-      });
-
-      document.getElementById('pesan').value = '';
-      document.getElementById('foto').value = '';
-      alert('Laporan berhasil dikirim!');
-      loadData();
-    };
-
-    async function updateStatus(id, status) {
-      const tanggapan = document.getElementById('reply-' + id).value;
-      await fetch('/api/laporan/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status, tanggapan })
-      });
-      alert('Status laporan diperbarui!');
-      loadData();
-    }
-
-    async function deleteLaporan(id) {
-      if (confirm('Yakin ingin menghapus aduan ini dari daftar?')) {
-        await fetch('/api/laporan/delete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        });
-        alert('Aduan berhasil dihapus!');
-        loadData();
-      }
-    }
-
-    loadData();
-  </script>
-</body>
-</html>
+          '<div class="mt-3 p-3 bg-slate-50 border-l-4 ' + (item.status === 'Ditolak' ? 'border-rose-500' : 'border-indigo-500') + ' text-xs text-slate
