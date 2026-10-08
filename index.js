@@ -32,6 +32,7 @@ function readData() {
         tanggapan: 'Terima kasih, teknisi sarpras akan mengecek ke lokasi hari ini.',
         foto: '',
         upvotes: 3,
+        komentar: ['Tolong dikirim teknisi secepatnya ya pak.'],
         tanggal: '2026-10-08'
       }
     ];
@@ -76,6 +77,7 @@ app.post('/api/aspirasi', (req, res) => {
     tanggapan: '',
     foto: foto || '',
     upvotes: 0,
+    komentar: [],
     tanggal: new Date().toISOString().split('T')[0]
   };
 
@@ -92,6 +94,21 @@ app.post('/api/aspirasi/:id/upvote', (req, res) => {
     item.upvotes = (item.upvotes || 0) + 1;
     writeData(data);
     res.json({ success: true, upvotes: item.upvotes });
+  } else {
+    res.status(404).json({ success: false });
+  }
+});
+
+// Tambah Komentar
+app.post('/api/aspirasi/:id/komentar', (req, res) => {
+  const { teks } = req.body;
+  const data = readData();
+  const item = data.find(a => a.id == req.params.id);
+  if (item) {
+    if (!item.komentar) item.komentar = [];
+    item.komentar.push(teks);
+    writeData(data);
+    res.json({ success: true });
   } else {
     res.status(404).json({ success: false });
   }
