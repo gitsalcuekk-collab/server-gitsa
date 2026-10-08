@@ -5,33 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aspirasi SMK Walisongo 2 Gempol</title>
   <style>
+    :root {
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --text-main: #334155;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --input-bg: #f8fafc;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+    }
+
+    body.dark-mode {
+      --bg-body: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --input-bg: #0f172a;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      transition: background-color 0.2s, color 0.2s;
     }
 
     body {
-      background-color: #f1f5f9;
-      color: #334155;
+      background-color: var(--bg-body);
+      color: var(--text-main);
       padding-bottom: 40px;
     }
 
     /* Header Navbar */
     .header {
-      background-color: #4f46e5;
+      background-color: var(--primary);
       color: #ffffff;
-      padding: 16px 20px;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 18px 20px;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .header-content {
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     .header h1 {
       font-size: 1.25rem;
-      font-weight: 700;
+      font-weight: 800;
       margin-bottom: 2px;
+      letter-spacing: -0.3px;
     }
 
     .header p {
@@ -43,30 +70,38 @@
     .nav-buttons {
       display: flex;
       gap: 8px;
-      flex-wrap: wrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .nav-buttons::-webkit-scrollbar {
+      display: none;
     }
 
     .btn-nav {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.18);
       color: white;
       border: none;
       padding: 8px 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-nav.active {
       background-color: #ffffff;
-      color: #4f46e5;
+      color: var(--primary);
     }
 
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -74,23 +109,24 @@
     /* Grid Statistik */
     .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
       margin-bottom: 16px;
     }
 
     .stat-card {
-      background: white;
+      background: var(--bg-card);
       padding: 14px;
       border-radius: 16px;
       text-align: center;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
     }
 
     .stat-card .title {
       font-size: 0.7rem;
       font-weight: 700;
-      color: #64748b;
+      color: var(--text-muted);
       letter-spacing: 0.5px;
       text-transform: uppercase;
       margin-bottom: 4px;
@@ -101,25 +137,29 @@
       font-weight: 800;
     }
 
-    .val-total { color: #2563eb; }
-    .val-proses { color: #d97706; }
-    .val-selesai { color: #16a34a; }
-    .val-ditolak { color: #dc2626; }
+    .val-total { color: #3b82f6; }
+    .val-proses { color: #f59e0b; }
+    .val-selesai { color: #10b981; }
+    .val-ditolak { color: #ef4444; }
 
     /* Card Main */
     .card {
-      background: white;
+      background: var(--bg-card);
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       margin-bottom: 16px;
+      border: 1px solid var(--border-color);
     }
 
     .card-title {
-      color: #3730a3;
+      color: var(--primary);
       font-size: 1.05rem;
       font-weight: 700;
       margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .form-group {
@@ -130,7 +170,7 @@
       display: block;
       font-size: 0.75rem;
       font-weight: 700;
-      color: #475569;
+      color: var(--text-muted);
       text-transform: uppercase;
       margin-bottom: 6px;
       letter-spacing: 0.5px;
@@ -139,22 +179,21 @@
     .form-control {
       width: 100%;
       padding: 10px 14px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       font-size: 0.9rem;
-      color: #1e293b;
+      color: var(--text-main);
       outline: none;
-      background-color: #f8fafc;
+      background-color: var(--input-bg);
     }
 
     .form-control:focus {
-      border-color: #6366f1;
-      background-color: #ffffff;
+      border-color: var(--primary);
     }
 
     textarea.form-control {
       resize: vertical;
-      min-height: 80px;
+      min-height: 85px;
     }
 
     /* Upload Area */
@@ -163,21 +202,32 @@
       border-radius: 12px;
       padding: 14px;
       text-align: center;
-      background-color: #f5f3ff;
-      color: #4f46e5;
+      background-color: var(--input-bg);
+      color: var(--primary);
       font-weight: 600;
       font-size: 0.85rem;
       cursor: pointer;
+      display: block;
     }
 
     .upload-box input[type="file"] {
       display: none;
     }
 
+    #previewFoto {
+      max-width: 100%;
+      max-height: 180px;
+      border-radius: 12px;
+      margin-top: 10px;
+      display: none;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+    }
+
     /* Button Primary */
     .btn-submit {
       width: 100%;
-      background-color: #4f46e5;
+      background-color: var(--primary);
       color: white;
       border: none;
       padding: 12px;
@@ -189,17 +239,44 @@
     }
 
     .btn-submit:hover {
-      background-color: #4338ca;
+      background-color: var(--primary-hover);
     }
 
-    /* Aspirasi Item List */
+    /* Grafik Kategori */
+    .chart-item {
+      margin-bottom: 12px;
+    }
+    .chart-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chart-bar-bg {
+      background-color: var(--input-bg);
+      height: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .chart-bar-fill {
+      background-color: var(--primary);
+      height: 100%;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
+    /* Item Aspirasi */
     .aspirasi-item {
-      background: white;
+      background: var(--bg-card);
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      border-left: 4px solid #6366f1;
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--primary);
     }
 
     .badge {
@@ -213,20 +290,55 @@
     .badge-proses { background-color: #fef3c7; color: #d97706; }
     .badge-selesai { background-color: #dcfce7; color: #16a34a; }
     .badge-menunggu { background-color: #e0e7ff; color: #4338ca; }
+    .badge-ditolak { background-color: #fee2e2; color: #dc2626; }
+
+    .btn-delete {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Modal Popups */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid var(--border-color);
+    }
   </style>
 </head>
 <body>
 
   <!-- Header Section -->
   <div class="header">
-    <h1>Aspirasi SMK Walisongo 2 Gempol</h1>
-    <p>Sistem Pengaduan & Aspirasi Siswa Digital</p>
+    <div class="header-content">
+      <h1>Aspirasi SMK Walisongo 2 Gempol</h1>
+      <p>Sistem Pengaduan & Aspirasi Siswa Digital</p>
 
-    <div class="nav-buttons">
-      <button class="btn-nav">❓ Panduan</button>
-      <button class="btn-nav">🌙 / ☀️</button>
-      <button class="btn-nav active">Mode Siswa</button>
-      <button class="btn-nav">Portal Guru / Admin</button>
+      <div class="nav-buttons">
+        <button class="btn-nav" onclick="openModal('modalPanduan')">❓ Panduan</button>
+        <button class="btn-nav" onclick="toggleDarkMode()">🌙 / ☀️</button>
+        <button class="btn-nav active" id="btnModeSiswa" onclick="switchMode('siswa')">👤 Mode Siswa</button>
+        <button class="btn-nav" id="btnModeGuru" onclick="switchMode('guru')">👨‍🏫 Mode Guru</button>
+      </div>
     </div>
   </div>
 
@@ -251,8 +363,14 @@
       </div>
     </div>
 
-    <!-- Form Kirim Aspirasi Anonim -->
+    <!-- Grafik Kategori Laporan Terbanyak -->
     <div class="card">
+      <div class="card-title">📊 Grafik Kategori Terbanyak</div>
+      <div id="chartContainer"></div>
+    </div>
+
+    <!-- Form Kirim Aspirasi Anonim (Siswa) -->
+    <div class="card" id="formCard">
       <div class="card-title">Kirim Aspirasi Anonim</div>
       
       <form id="formAspirasi">
@@ -286,6 +404,7 @@
             + Pilih Foto Dari HP
             <input type="file" id="fotoInput" accept="image/*">
           </label>
+          <img id="previewFoto" alt="Preview Foto">
         </div>
 
         <button type="submit" class="btn-submit">Kirim Laporan</button>
@@ -295,21 +414,21 @@
     <!-- Search & Filter Card -->
     <div class="card">
       <div class="form-group">
-        <input type="text" class="form-control" id="searchKeyword" placeholder="🔍 Cari kata kunci atau #TIKET...">
+        <input type="text" class="form-control" id="searchKeyword" placeholder="🔍 Cari kata kunci atau #TIKET..." oninput="renderAspirasi()">
       </div>
-      <div class="form-group">
-        <select class="form-control" id="filterStatus">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <select class="form-control" id="filterStatus" onchange="renderAspirasi()">
           <option value="">Semua Status</option>
           <option value="Menunggu">Menunggu</option>
           <option value="Diproses">Diproses</option>
           <option value="Selesai">Selesai</option>
+          <option value="Ditolak">Ditolak</option>
         </select>
-      </div>
-      <div class="form-group" style="margin-bottom: 0;">
-        <select class="form-control" id="filterUrgensi">
+        <select class="form-control" id="filterUrgensi" onchange="renderAspirasi()">
           <option value="">Semua Urgensi</option>
           <option value="Biasa">Biasa</option>
           <option value="Penting">Penting</option>
+          <option value="Sangat Mendesak">Sangat Mendesak</option>
         </select>
       </div>
     </div>
@@ -318,57 +437,213 @@
     <div id="aspirasiList"></div>
   </div>
 
+  <!-- Modal Panduan -->
+  <div class="modal-overlay" id="modalPanduan">
+    <div class="modal-card">
+      <div class="card-title">📖 Panduan Penggunaan</div>
+      <p style="font-size:0.85rem; line-height:1.5; margin-bottom:12px;">
+        1. **Pilih Kategori & Urgensi** sesuai keluhanmu.<br>
+        2. **Isi Laporan** dengan jelas dan sopan.<br>
+        3. **Upload Foto (Opsional)** sebagai bukti pendukung dari HP/kamera.<br>
+        4. Klik **Kirim Laporan**. Identitasmu dijamin **100% Anonim**!<br>
+        5. Cek respon atau tanggapan dari guru melalui nomor tiket laporanmu.
+      </p>
+      <button class="btn-submit" onclick="closeModal('modalPanduan')">Mengerti</button>
+    </div>
+  </div>
+
+  <!-- Modal Login Guru -->
+  <div class="modal-overlay" id="modalLogin">
+    <div class="modal-card">
+      <div class="card-title">🔒 Login Mode Guru</div>
+      <form id="formLoginGuru">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" class="form-control" id="usernameGuru" placeholder="Masukkan username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" id="passwordGuru" placeholder="Masukkan password">
+        </div>
+        <button type="submit" class="btn-submit">Login Guru</button>
+        <button type="button" class="btn-submit" style="background:#64748b; margin-top:6px;" onclick="closeModal('modalLogin')">Batal</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     let rawFoto = '';
+    let isGuruLoggedIn = false;
+    let allData = [];
 
-    // Handle foto converter base64
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    // Modal Control
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Preview Foto dari HP
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
+      const preview = document.getElementById('previewFoto');
       if (file) {
         const reader = new FileReader();
         reader.onload = function(evt) {
           rawFoto = evt.target.result;
+          preview.src = rawFoto;
+          preview.style.display = 'block';
         };
         reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+        rawFoto = '';
       }
     });
 
-    // Load Aspirasi
-    async function loadAspirasi() {
+    // Mode Switcher (Siswa / Guru)
+    function switchMode(mode) {
+      if (mode === 'guru' && !isGuruLoggedIn) {
+        openModal('modalLogin');
+      } else if (mode === 'siswa') {
+        isGuruLoggedIn = false;
+        document.getElementById('btnModeSiswa').classList.add('active');
+        document.getElementById('btnModeGuru').classList.remove('active');
+        document.getElementById('formCard').style.display = 'block';
+        renderAspirasi();
+      }
+    }
+
+    // Handle Login Guru
+    document.getElementById('formLoginGuru').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const u = document.getElementById('usernameGuru').value;
+      const p = document.getElementById('passwordGuru').value;
+
+      if (u === 'guru' && p === 'guru969') {
+        isGuruLoggedIn = true;
+        closeModal('modalLogin');
+        document.getElementById('btnModeGuru').classList.add('active');
+        document.getElementById('btnModeSiswa').classList.remove('active');
+        document.getElementById('formCard').style.display = 'none';
+        alert('Berhasil Login sebagai Guru!');
+        renderAspirasi();
+      } else {
+        alert('Username atau Password Guru Salah!');
+      }
+    });
+
+    // Load Data Aspirasi & Grafik
+    async function fetchAspirasi() {
       try {
         const res = await fetch('/api/aspirasi');
-        const data = await res.json();
-        
-        // Update stats
-        document.getElementById('stat-total').innerText = data.length;
-        document.getElementById('stat-proses').innerText = data.filter(a => a.status === 'Diproses').length;
-        document.getElementById('stat-selesai').innerText = data.filter(a => a.status === 'Selesai').length;
-        document.getElementById('stat-ditolak').innerText = data.filter(a => a.status === 'Ditolak').length;
-
-        const listContainer = document.getElementById('aspirasiList');
-        listContainer.innerHTML = '';
-
-        data.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'aspirasi-item';
-          card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <strong style="color:#4f46e5; font-size:0.85rem;">#${item.ticket}</strong>
-              <span class="badge badge-${(item.status || 'menunggu').toLowerCase()}">${item.status || 'Menunggu'}</span>
-            </div>
-            <p style="font-size:0.9rem; color:#1e293b; margin-bottom:8px;">${item.pesan}</p>
-            <div style="font-size:0.75rem; color:#64748b;">
-              Kategori: ${item.kategori} | Urgensi: ${item.urgensi}
-            </div>
-          `;
-          listContainer.appendChild(card);
-        });
+        allData = await res.json();
+        updateStats();
+        updateChart();
+        renderAspirasi();
       } catch (err) {
         console.error(err);
       }
     }
 
-    // Submit Aspirasi
+    // Update Statistik Card
+    function updateStats() {
+      document.getElementById('stat-total').innerText = allData.length;
+      document.getElementById('stat-proses').innerText = allData.filter(a => a.status === 'Diproses').length;
+      document.getElementById('stat-selesai').innerText = allData.filter(a => a.status === 'Selesai').length;
+      document.getElementById('stat-ditolak').innerText = allData.filter(a => a.status === 'Ditolak').length;
+    }
+
+    // Update Grafik Kategori
+    function updateChart() {
+      const counts = {};
+      allData.forEach(item => {
+        const k = item.kategori || 'Lainnya';
+        counts[k] = (counts[k] || 0) + 1;
+      });
+
+      const container = document.getElementById('chartContainer');
+      container.innerHTML = '';
+
+      const total = allData.length || 1;
+      const categories = ['Fasilitas Sekolah', 'Sistem Pembelajaran', 'Kedisiplinan & Lingkungan', 'Lainnya'];
+
+      categories.forEach(cat => {
+        const count = counts[cat] || 0;
+        const percent = Math.round((count / total) * 100);
+
+        container.innerHTML += `
+          <div class="chart-item">
+            <div class="chart-label">
+              <span>${cat}</span>
+              <span>${count} laporan (${percent}%)</span>
+            </div>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" style="width: ${percent}%;"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Render List Aspirasi
+    function renderAspirasi() {
+      const search = document.getElementById('searchKeyword').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const urgensiFilter = document.getElementById('filterUrgensi').value;
+
+      const listContainer = document.getElementById('aspirasiList');
+      listContainer.innerHTML = '';
+
+      const filtered = allData.filter(item => {
+        const matchSearch = item.pesan.toLowerCase().includes(search) || item.ticket.toLowerCase().includes(search);
+        const matchStatus = !statusFilter || item.status === statusFilter;
+        const matchUrgensi = !urgensiFilter || item.urgensi === urgensiFilter;
+        return matchSearch && matchStatus && matchUrgensi;
+      });
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted); padding:20px;">Belum ada laporan aspirasi.</p>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'aspirasi-item';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="color:var(--primary); font-size:0.85rem;">#${item.ticket}</strong>
+            <div>
+              <span class="badge badge-${(item.status || 'menunggu').toLowerCase()}">${item.status || 'Menunggu'}</span>
+              ${isGuruLoggedIn ? `<button class="btn-delete" onclick="hapusLaporan(${item.id})">🗑️ Hapus</button>` : ''}
+            </div>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-main); margin-bottom:8px;">${item.pesan}</p>
+          ${item.foto ? `<img src="${item.foto}" style="max-width:100%; max-height:160px; border-radius:10px; margin-bottom:8px; display:block;">` : ''}
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">
+            📂 ${item.kategori} | ⚡ ${item.urgensi} | 📅 ${item.tanggal || ''}
+          </div>
+          ${item.tanggapan ? `<div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; font-size:0.8rem; border-left:3px solid #10b981; margin-top:6px;"><strong>Respon Guru:</strong> ${item.tanggapan}</div>` : ''}
+          
+          ${isGuruLoggedIn ? `
+            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--border-color);">
+              <select class="form-control" style="font-size:0.8rem; margin-bottom:6px;" id="statusSelect-${item.id}">
+                <option value="Diproses" ${item.status === 'Diproses' ? 'selected' : ''}>Set Status: Diproses</option>
+                <option value="Selesai" ${item.status === 'Selesai' ? 'selected' : ''}>Set Status: Selesai</option>
+                <option value="Ditolak" ${item.status === 'Ditolak' ? 'selected' : ''}>Set Status: Ditolak</option>
+              </select>
+              <input type="text" class="form-control" style="font-size:0.8rem; margin-bottom:6px;" id="tanggapanInput-${item.id}" placeholder="Tulis tanggapan guru..." value="${item.tanggapan || ''}">
+              <button class="btn-submit" style="padding:6px; font-size:0.8rem;" onclick="tanggapiLaporan(${item.id})">Simpan Tanggapan</button>
+            </div>
+          ` : ''}
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    // Submit Aspirasi Baru (Siswa)
     document.getElementById('formAspirasi').addEventListener('submit', async function(e) {
       e.preventDefault();
       const pesan = document.getElementById('pesan').value;
@@ -384,11 +659,37 @@
       });
 
       document.getElementById('pesan').value = '';
+      document.getElementById('fotoInput').value = '';
+      document.getElementById('previewFoto').style.display = 'none';
       rawFoto = '';
-      loadAspirasi();
+      alert('Aspirasi berhasil dikirimkan!');
+      fetchAspirasi();
     });
 
-    loadAspirasi();
+    // Tanggapi Laporan (Guru)
+    async function tanggapiLaporan(id) {
+      const status = document.getElementById(`statusSelect-${id}`).value;
+      const tanggapan = document.getElementById(`tanggapanInput-${id}`).value;
+
+      await fetch('/api/admin/tanggapi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, tanggapan })
+      });
+
+      alert('Tanggapan berhasil disimpan!');
+      fetchAspirasi();
+    }
+
+    // Hapus Laporan Spam (Guru)
+    async function hapusLaporan(id) {
+      if (confirm('Yakin ingin menghapus laporan spam ini?')) {
+        await fetch(`/api/aspirasi/${id}`, { method: 'DELETE' });
+        fetchAspirasi();
+      }
+    }
+
+    fetchAspirasi();
   </script>
 </body>
 </html>
