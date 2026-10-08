@@ -157,6 +157,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .form-group {
@@ -260,28 +262,40 @@
       line-height: 1.4;
     }
 
-    /* Grafik Kategori */
-    .chart-item { margin-bottom: 12px; }
-    .chart-label {
+    /* Grafik Donut Chart CSS */
+    .donut-chart-box {
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: space-around;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 10px 0;
+    }
+
+    .donut-svg {
+      width: 140px;
+      height: 140px;
+      transform: rotate(-90deg);
+      border-radius: 50%;
+    }
+
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 4px;
     }
-    .chart-bar-bg {
-      background-color: var(--input-bg);
-      height: 10px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .chart-bar-fill {
-      background-color: var(--primary);
-      height: 100%;
-      width: 0%;
-      border-radius: 10px;
-      transition: width 0.4s ease;
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
     }
 
     /* Item Aspirasi */
@@ -293,6 +307,30 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border-color);
       border-left: 5px solid var(--primary);
+      position: relative;
+    }
+
+    .aspirasi-item.urgent-item {
+      border-left-color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.02);
+    }
+
+    .badge-urgent-flash {
+      background-color: #fee2e2;
+      color: #ef4444;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 6px;
+      animation: pulse 1.5s infinite;
+      display: inline-block;
+      margin-left: 4px;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
     }
 
     .badge {
@@ -320,6 +358,20 @@
     .btn-delete { background-color: #fee2e2; color: #dc2626; }
     .btn-upvote { background-color: #e0e7ff; color: #4338ca; margin-right: 6px; }
 
+    /* Komentar Section */
+    .comments-box {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-color);
+    }
+    .comment-item {
+      background: var(--input-bg);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      margin-bottom: 4px;
+    }
+
     /* Modal Popups */
     .modal-overlay {
       position: fixed;
@@ -340,9 +392,37 @@
       max-width: 440px;
       border: 1px solid var(--border-color);
     }
+
+    /* Toast Notification */
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: #10b981;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-bottom: 8px;
+      animation: slideIn 0.3s forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Toast Notifikasi Container -->
+  <div id="toastContainer"></div>
 
   <!-- Header Section -->
   <div class="header">
@@ -380,13 +460,27 @@
       </div>
     </div>
 
-    <!-- Section Khusus Mode Guru (Grafik + Cetak Rekap) -->
+    <!-- Section Khusus Mode Guru (Grafik Bulat + Export CSV + Cetak) -->
     <div class="card" id="guruAnalyticsCard" style="display: none;">
       <div class="card-title">
-        <span>📊 Grafik Analisis Laporan (Guru Only)</span>
-        <button class="btn-action" style="background:#10b981; color:white;" onclick="window.print()">🖨️ Cetak Rekap</button>
+        <span>📊 Grafik Analisis Laporan</span>
+        <div>
+          <button class="btn-action" style="background:#2563eb; color:white; margin-right:4px;" onclick="exportCSV()">📥 Export CSV</button>
+          <button class="btn-action" style="background:#10b981; color:white;" onclick="window.print()">🖨️ Cetak Rekap</button>
+        </div>
       </div>
-      <div id="chartContainer"></div>
+      
+      <!-- Graphic Donut Chart Bulat -->
+      <div class="donut-chart-box">
+        <svg class="donut-svg" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#e2e8f0" stroke-width="4"></circle>
+          <circle id="slice1" cx="18" cy="18" r="15.915" fill="transparent" stroke="#6366f1" stroke-width="4" stroke-dasharray="0 100"></circle>
+          <circle id="slice2" cx="18" cy="18" r="15.915" fill="transparent" stroke="#3b82f6" stroke-width="4" stroke-dasharray="0 100"></circle>
+          <circle id="slice3" cx="18" cy="18" r="15.915" fill="transparent" stroke="#f59e0b" stroke-width="4" stroke-dasharray="0 100"></circle>
+          <circle id="slice4" cx="18" cy="18" r="15.915" fill="transparent" stroke="#10b981" stroke-width="4" stroke-dasharray="0 100"></circle>
+        </svg>
+        <div class="donut-legend" id="legendContainer"></div>
+      </div>
     </div>
 
     <!-- Form Kirim Aspirasi Anonim (Siswa) -->
@@ -409,7 +503,7 @@
           <select class="form-control" id="urgensi">
             <option>Biasa</option>
             <option>Penting</option>
-            <option>Sangat Mendesak</option>
+            <option value="Sangat Mendesak">🚨 Sangat Mendesak</option>
           </select>
         </div>
 
@@ -436,7 +530,7 @@
       <div class="form-group">
         <input type="text" class="form-control" id="searchKeyword" placeholder="🔍 Cari kata kunci atau #TIKET..." oninput="renderAspirasi()">
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
         <select class="form-control" id="filterStatus" onchange="renderAspirasi()">
           <option value="">Semua Status</option>
           <option value="Menunggu">Menunggu</option>
@@ -448,8 +542,20 @@
           <option value="">Semua Urgensi</option>
           <option value="Biasa">Biasa</option>
           <option value="Penting">Penting</option>
-          <option value="Sangat Mendesak">Sangat Mendesak</option>
+          <option value="Sangat Mendesak">🚨 Sangat Mendesak</option>
         </select>
+      </div>
+
+      <!-- Filter Rentang Tanggal -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div>
+          <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">DARI TANGGAL</label>
+          <input type="date" class="form-control" id="filterDateStart" onchange="renderAspirasi()">
+        </div>
+        <div>
+          <label style="font-size:0.7rem; font-weight:700; color:var(--text-muted);">SAMPAI TANGGAL</label>
+          <input type="date" class="form-control" id="filterDateEnd" onchange="renderAspirasi()">
+        </div>
       </div>
     </div>
 
@@ -515,6 +621,17 @@
     let isGuruLoggedIn = false;
     let allData = [];
 
+    // Toast Custom Notification
+    function showToast(msg, isError = false) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (isError) toast.style.background = '#ef4444';
+      toast.innerText = msg;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
     // Dark Mode Toggle
     function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
@@ -573,11 +690,11 @@
         document.getElementById('btnModeSiswa').classList.remove('active');
         document.getElementById('formCard').style.display = 'none';
         document.getElementById('guruAnalyticsCard').style.display = 'block';
-        alert('Berhasil Login sebagai Guru!');
+        showToast('Berhasil Login sebagai Guru!');
         updateChart();
         renderAspirasi();
       } else {
-        alert('Username atau Password Guru Salah!');
+        showToast('Username atau Password Guru Salah!', true);
       }
     });
 
@@ -595,7 +712,6 @@
         allData = await res.json();
         syncLocalStorage(allData);
       } catch (err) {
-        // Jika server restart/offline, pakai data backup local
         const saved = localStorage.getItem('aspirasi_backup');
         if (saved) allData = JSON.parse(saved);
       }
@@ -612,7 +728,7 @@
       document.getElementById('stat-ditolak').innerText = allData.filter(a => a.status === 'Ditolak').length;
     }
 
-    // Update Grafik Kategori (Mode Guru Only)
+    // Update Grafik Donut Chart Bulat
     function updateChart() {
       const counts = {};
       allData.forEach(item => {
@@ -620,44 +736,66 @@
         counts[k] = (counts[k] || 0) + 1;
       });
 
-      const container = document.getElementById('chartContainer');
-      container.innerHTML = '';
-
       const total = allData.length || 1;
-      const categories = ['Fasilitas Sekolah', 'Sistem Pembelajaran', 'Kedisiplinan & Lingkungan', 'Lainnya'];
+      const categories = [
+        { name: 'Fasilitas Sekolah', color: '#6366f1', id: 'slice1' },
+        { name: 'Sistem Pembelajaran', color: '#3b82f6', id: 'slice2' },
+        { name: 'Kedisiplinan & Lingkungan', color: '#f59e0b', id: 'slice3' },
+        { name: 'Lainnya', color: '#10b981', id: 'slice4' }
+      ];
+
+      let accumulatedPercent = 0;
+      const legendBox = document.getElementById('legendContainer');
+      legendBox.innerHTML = '';
 
       categories.forEach(cat => {
-        const count = counts[cat] || 0;
+        const count = counts[cat.name] || 0;
         const percent = Math.round((count / total) * 100);
 
-        container.innerHTML += `
-          <div class="chart-item">
-            <div class="chart-label">
-              <span>${cat}</span>
-              <span>${count} laporan (${percent}%)</span>
-            </div>
-            <div class="chart-bar-bg">
-              <div class="chart-bar-fill" style="width: ${percent}%;"></div>
-            </div>
+        const circle = document.getElementById(cat.id);
+        if (circle) {
+          circle.setAttribute('stroke-dasharray', `${percent} ${100 - percent}`);
+          circle.setAttribute('stroke-dashoffset', `-${accumulatedPercent}`);
+        }
+        accumulatedPercent += percent;
+
+        legendBox.innerHTML += `
+          <div class="legend-item">
+            <div class="legend-color" style="background:${cat.color}"></div>
+            <span><strong>${cat.name}:</strong> ${count} (${percent}%)</span>
           </div>
         `;
       });
     }
 
-    // Render List Aspirasi
+    // Render List Aspirasi (Sorting Urgent Ke Atas)
     function renderAspirasi() {
       const search = document.getElementById('searchKeyword').value.toLowerCase();
       const statusFilter = document.getElementById('filterStatus').value;
       const urgensiFilter = document.getElementById('filterUrgensi').value;
+      const dateStart = document.getElementById('filterDateStart').value;
+      const dateEnd = document.getElementById('filterDateEnd').value;
 
       const listContainer = document.getElementById('aspirasiList');
       listContainer.innerHTML = '';
 
-      const filtered = allData.filter(item => {
+      let filtered = allData.filter(item => {
         const matchSearch = item.pesan.toLowerCase().includes(search) || item.ticket.toLowerCase().includes(search);
         const matchStatus = !statusFilter || item.status === statusFilter;
         const matchUrgensi = !urgensiFilter || item.urgensi === urgensiFilter;
-        return matchSearch && matchStatus && matchUrgensi;
+        
+        let matchDate = true;
+        if (dateStart && item.tanggal) matchDate = matchDate && (item.tanggal >= dateStart);
+        if (dateEnd && item.tanggal) matchDate = matchDate && (item.tanggal <= dateEnd);
+
+        return matchSearch && matchStatus && matchUrgensi && matchDate;
+      });
+
+      // Pinned top untuk "Sangat Mendesak"
+      filtered.sort((a, b) => {
+        if (a.urgensi === 'Sangat Mendesak' && b.urgensi !== 'Sangat Mendesak') return -1;
+        if (a.urgensi !== 'Sangat Mendesak' && b.urgensi === 'Sangat Mendesak') return 1;
+        return 0;
       });
 
       if (filtered.length === 0) {
@@ -666,11 +804,20 @@
       }
 
       filtered.forEach(item => {
+        const isUrgent = item.urgensi === 'Sangat Mendesak';
         const card = document.createElement('div');
-        card.className = 'aspirasi-item';
+        card.className = `aspirasi-item ${isUrgent ? 'urgent-item' : ''}`;
+        
+        const commentsHtml = (item.komentar || []).map(k => `
+          <div class="comment-item">💬 ${k}</div>
+        `).join('');
+
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <strong style="color:var(--primary); font-size:0.85rem;">#${item.ticket}</strong>
+            <div>
+              <strong style="color:var(--primary); font-size:0.85rem;">#${item.ticket}</strong>
+              ${isUrgent ? `<span class="badge-urgent-flash">🚨 URGENT</span>` : ''}
+            </div>
             <div>
               <span class="badge badge-${(item.status || 'menunggu').toLowerCase()}">${item.status || 'Menunggu'}</span>
               ${isGuruLoggedIn ? `<button class="btn-action btn-delete" onclick="hapusLaporan(${item.id})">🗑️ Hapus</button>` : ''}
@@ -686,6 +833,15 @@
 
           ${item.tanggapan ? `<div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; font-size:0.8rem; border-left:3px solid #10b981; margin-top:10px;"><strong>Respon Guru:</strong> ${item.tanggapan}</div>` : ''}
           
+          <!-- Section Komentar -->
+          <div class="comments-box">
+            ${commentsHtml}
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <input type="text" class="form-control" style="font-size:0.75rem; padding:6px 10px;" placeholder="Tulis komentar/diskusi..." id="commentInput-${item.id}">
+              <button class="btn-action" style="background:var(--primary); color:white;" onclick="tambahKomentar(${item.id})">Kirim</button>
+            </div>
+          </div>
+
           ${isGuruLoggedIn ? `
             <div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--border-color);">
               <select class="form-control" style="font-size:0.8rem; margin-bottom:6px;" id="statusSelect-${item.id}">
@@ -708,6 +864,39 @@
       fetchAspirasi();
     }
 
+    // Tambah Komentar / Diskusi
+    async function tambahKomentar(id) {
+      const input = document.getElementById(`commentInput-${id}`);
+      const text = input.value;
+      if (!text) return showToast('Komentar tidak boleh kosong!', true);
+
+      await fetch(`/api/aspirasi/${id}/komentar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teks: text })
+      });
+
+      input.value = '';
+      showToast('Komentar dikirim!');
+      fetchAspirasi();
+    }
+
+    // Export Data CSV
+    function exportCSV() {
+      let csv = 'Tiket,Kategori,Urgensi,Pesan,Status,Tanggapan,Tanggal\n';
+      allData.forEach(d => {
+        csv += `"${d.ticket}","${d.kategori}","${d.urgensi}","${d.pesan.replace(/"/g, '""')}","${d.status}","${(d.tanggapan || '').replace(/"/g, '""')}","${d.tanggal}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `Rekap_Aspirasi_SMK_Walisongo_2_${new Date().toISOString().split('T')[0]}.csv`);
+      a.click();
+      showToast('File CSV berhasil di-download!');
+    }
+
     // Submit Aspirasi Baru (Siswa)
     document.getElementById('formAspirasi').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -715,7 +904,7 @@
       const kategori = document.getElementById('kategori').value;
       const urgensi = document.getElementById('urgensi').value;
 
-      if (!pesan) return alert('Pesan tidak boleh kosong!');
+      if (!pesan) return showToast('Pesan tidak boleh kosong!', true);
 
       await fetch('/api/aspirasi', {
         method: 'POST',
@@ -727,7 +916,7 @@
       document.getElementById('fotoInput').value = '';
       document.getElementById('previewFoto').style.display = 'none';
       rawFoto = '';
-      alert('Aspirasi berhasil dikirimkan!');
+      showToast('Aspirasi berhasil dikirimkan!');
       fetchAspirasi();
     });
 
@@ -742,7 +931,7 @@
         body: JSON.stringify({ id, status, tanggapan })
       });
 
-      alert('Tanggapan berhasil disimpan!');
+      showToast('Tanggapan berhasil disimpan!');
       fetchAspirasi();
     }
 
@@ -750,6 +939,7 @@
     async function hapusLaporan(id) {
       if (confirm('Yakin ingin menghapus laporan spam ini?')) {
         await fetch(`/api/aspirasi/${id}`, { method: 'DELETE' });
+        showToast('Laporan berhasil dihapus');
         fetchAspirasi();
       }
     }
