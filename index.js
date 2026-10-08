@@ -7,14 +7,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-// Middleware parsing data (JSON base64 foto & teks)
+// Middleware parsing data (JSON base64 foto & teks hingga 15MB)
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // Melayani file statis
 app.use(express.static(__dirname));
 
-// Route Utama: Menampilkan index.html yang ada di folder root
+// Route Utama: Menampilkan index.html yang ada di root folder
 app.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, 'index.html');
   if (fs.existsSync(htmlPath)) {
@@ -62,11 +62,14 @@ function writeData(data) {
   }
 }
 
-// API Endpoint
+// --- API ENDPOINTS ---
+
+// 1. Get Semua Aspirasi
 app.get('/api/aspirasi', (req, res) => {
   res.json(readData());
 });
 
+// 2. Tambah Aspirasi Baru (Siswa)
 app.post('/api/aspirasi', (req, res) => {
   const { kategori, urgensi, pesan, foto } = req.body;
   if (!pesan) {
@@ -92,6 +95,7 @@ app.post('/api/aspirasi', (req, res) => {
   res.json({ success: true, data: newItem });
 });
 
+// 3. Upvote Aspirasi
 app.post('/api/aspirasi/:id/upvote', (req, res) => {
   const data = readData();
   const item = data.find(a => a.id == req.params.id);
@@ -104,6 +108,7 @@ app.post('/api/aspirasi/:id/upvote', (req, res) => {
   }
 });
 
+// 4. Tanggapi Laporan & Ubah Status (Guru / Admin)
 app.post('/api/admin/tanggapi', (req, res) => {
   const { id, status, tanggapan } = req.body;
   const data = readData();
@@ -118,7 +123,21 @@ app.post('/api/admin/tanggapi', (req, res) => {
   }
 });
 
-// Pastikan mendengarkan di '0.0.0.0'
+// 5. Hapus Laporan Spam (Guru / Admin)
+app.delete('/api/aspirasi/:id', (req, res) => {
+  let data = readData();
+  const initialLength = data.length;
+  data = data.filter(a => a.id != req.params.id);
+  
+  if (data.length < initialLength) {
+    writeData(data);
+    res.json({ success: true, message: 'Laporan berhasil dihapus' });
+  } else {
+    res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
+  }
+});
+
+// Pastikan IP binding mendengarkan di '0.0.0.0'
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server aktif pada port ${PORT}`);
+  console.log(`Server Aspirasi SMK Walisongo 2 Gempol berjalan di port ${PORT}`);
 });
