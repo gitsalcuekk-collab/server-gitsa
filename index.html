@@ -6,12 +6,12 @@
   <title>Aspirasi SMK Walisongo 2 Gempol</title>
   <style>
     :root {
-      --bg-body: #f1f5f9;
+      --bg-body: #f8fafc;
       --bg-card: #ffffff;
-      --text-main: #334155;
+      --text-main: #1e293b;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
-      --input-bg: #f8fafc;
+      --input-bg: #f1f5f9;
       --primary: #4f46e5;
       --primary-hover: #4338ca;
     }
@@ -50,7 +50,7 @@
     }
 
     .header-content {
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
     }
 
@@ -58,7 +58,6 @@
       font-size: 1.25rem;
       font-weight: 800;
       margin-bottom: 2px;
-      letter-spacing: -0.3px;
     }
 
     .header p {
@@ -75,9 +74,7 @@
       scrollbar-width: none;
     }
 
-    .nav-buttons::-webkit-scrollbar {
-      display: none;
-    }
+    .nav-buttons::-webkit-scrollbar { display: none; }
 
     .btn-nav {
       background-color: rgba(255, 255, 255, 0.18);
@@ -101,7 +98,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -196,7 +193,6 @@
       min-height: 85px;
     }
 
-    /* Upload Area */
     .upload-box {
       border: 2px dashed #c7d2fe;
       border-radius: 12px;
@@ -210,9 +206,7 @@
       display: block;
     }
 
-    .upload-box input[type="file"] {
-      display: none;
-    }
+    .upload-box input[type="file"] { display: none; }
 
     #previewFoto {
       max-width: 100%;
@@ -224,7 +218,6 @@
       border: 1px solid var(--border-color);
     }
 
-    /* Button Primary */
     .btn-submit {
       width: 100%;
       background-color: var(--primary);
@@ -238,14 +231,37 @@
       margin-top: 8px;
     }
 
-    .btn-submit:hover {
-      background-color: var(--primary-hover);
+    .btn-submit:hover { background-color: var(--primary-hover); }
+
+    /* Panduan UI Rapi */
+    .step-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .step-num {
+      background: var(--primary);
+      color: white;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 0.85rem;
+      line-height: 1.4;
     }
 
     /* Grafik Kategori */
-    .chart-item {
-      margin-bottom: 12px;
-    }
+    .chart-item { margin-bottom: 12px; }
     .chart-label {
       display: flex;
       justify-content: space-between;
@@ -292,9 +308,7 @@
     .badge-menunggu { background-color: #e0e7ff; color: #4338ca; }
     .badge-ditolak { background-color: #fee2e2; color: #dc2626; }
 
-    .btn-delete {
-      background-color: #fee2e2;
-      color: #dc2626;
+    .btn-action {
       border: none;
       padding: 6px 10px;
       border-radius: 8px;
@@ -302,6 +316,9 @@
       font-weight: 700;
       cursor: pointer;
     }
+
+    .btn-delete { background-color: #fee2e2; color: #dc2626; }
+    .btn-upvote { background-color: #e0e7ff; color: #4338ca; margin-right: 6px; }
 
     /* Modal Popups */
     .modal-overlay {
@@ -320,7 +337,7 @@
       padding: 24px;
       border-radius: 20px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       border: 1px solid var(--border-color);
     }
   </style>
@@ -363,9 +380,12 @@
       </div>
     </div>
 
-    <!-- Grafik Kategori Laporan Terbanyak -->
-    <div class="card">
-      <div class="card-title">📊 Grafik Kategori Terbanyak</div>
+    <!-- Section Khusus Mode Guru (Grafik + Cetak Rekap) -->
+    <div class="card" id="guruAnalyticsCard" style="display: none;">
+      <div class="card-title">
+        <span>📊 Grafik Analisis Laporan (Guru Only)</span>
+        <button class="btn-action" style="background:#10b981; color:white;" onclick="window.print()">🖨️ Cetak Rekap</button>
+      </div>
       <div id="chartContainer"></div>
     </div>
 
@@ -401,7 +421,7 @@
         <div class="form-group">
           <label>Upload Bukti Foto (HP/Kamera)</label>
           <label class="upload-box">
-            + Pilih Foto Dari HP
+            📷 Pilih Foto Dari HP
             <input type="file" id="fotoInput" accept="image/*">
           </label>
           <img id="previewFoto" alt="Preview Foto">
@@ -437,18 +457,37 @@
     <div id="aspirasiList"></div>
   </div>
 
-  <!-- Modal Panduan -->
+  <!-- Modal Panduan Rapi -->
   <div class="modal-overlay" id="modalPanduan">
     <div class="modal-card">
       <div class="card-title">📖 Panduan Penggunaan</div>
-      <p style="font-size:0.85rem; line-height:1.5; margin-bottom:12px;">
-        1. **Pilih Kategori & Urgensi** sesuai keluhanmu.<br>
-        2. **Isi Laporan** dengan jelas dan sopan.<br>
-        3. **Upload Foto (Opsional)** sebagai bukti pendukung dari HP/kamera.<br>
-        4. Klik **Kirim Laporan**. Identitasmu dijamin **100% Anonim**!<br>
-        5. Cek respon atau tanggapan dari guru melalui nomor tiket laporanmu.
-      </p>
-      <button class="btn-submit" onclick="closeModal('modalPanduan')">Mengerti</button>
+      
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Pilih Kategori & Urgensi:</strong> Tentukan jenis laporan dan tingkat kepentingannya.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Isi Keluhan:</strong> Jelaskan secara detail dan gunakan bahasa yang baik.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Bukti Foto:</strong> Lampirkan foto dari HP untuk memperkuat bukti laporan.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Kirim Laporan:</strong> Laporanmu terkirim secara <strong>100% Anonim</strong> tanpa melacak nama.</div>
+      </div>
+
+      <button class="btn-submit" onclick="closeModal('modalPanduan')">Saya Mengerti</button>
+    </div>
+  </div>
+
+  <!-- Modal Pop-Up Foto Full HD -->
+  <div class="modal-overlay" id="modalFoto">
+    <div class="modal-card" style="text-align: center;">
+      <img id="imgFull" style="max-width: 100%; max-height: 70vh; border-radius: 12px;">
+      <button class="btn-submit" style="margin-top: 12px;" onclick="closeModal('modalFoto')">Tutup</button>
     </div>
   </div>
 
@@ -477,13 +516,17 @@
     let allData = [];
 
     // Dark Mode Toggle
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
     // Modal Control
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Pop Up Foto Full Size
+    function showFullFoto(src) {
+      document.getElementById('imgFull').src = src;
+      openModal('modalFoto');
+    }
 
     // Preview Foto dari HP
     document.getElementById('fotoInput').addEventListener('change', function(e) {
@@ -512,6 +555,7 @@
         document.getElementById('btnModeSiswa').classList.add('active');
         document.getElementById('btnModeGuru').classList.remove('active');
         document.getElementById('formCard').style.display = 'block';
+        document.getElementById('guruAnalyticsCard').style.display = 'none';
         renderAspirasi();
       }
     }
@@ -528,24 +572,36 @@
         document.getElementById('btnModeGuru').classList.add('active');
         document.getElementById('btnModeSiswa').classList.remove('active');
         document.getElementById('formCard').style.display = 'none';
+        document.getElementById('guruAnalyticsCard').style.display = 'block';
         alert('Berhasil Login sebagai Guru!');
+        updateChart();
         renderAspirasi();
       } else {
         alert('Username atau Password Guru Salah!');
       }
     });
 
-    // Load Data Aspirasi & Grafik
+    // Backup LocalStorage (Data Permanen Anti Hilang)
+    function syncLocalStorage(data) {
+      if (data && data.length > 0) {
+        localStorage.setItem('aspirasi_backup', JSON.stringify(data));
+      }
+    }
+
+    // Load Data Aspirasi
     async function fetchAspirasi() {
       try {
         const res = await fetch('/api/aspirasi');
         allData = await res.json();
-        updateStats();
-        updateChart();
-        renderAspirasi();
+        syncLocalStorage(allData);
       } catch (err) {
-        console.error(err);
+        // Jika server restart/offline, pakai data backup local
+        const saved = localStorage.getItem('aspirasi_backup');
+        if (saved) allData = JSON.parse(saved);
       }
+      updateStats();
+      if (isGuruLoggedIn) updateChart();
+      renderAspirasi();
     }
 
     // Update Statistik Card
@@ -556,7 +612,7 @@
       document.getElementById('stat-ditolak').innerText = allData.filter(a => a.status === 'Ditolak').length;
     }
 
-    // Update Grafik Kategori
+    // Update Grafik Kategori (Mode Guru Only)
     function updateChart() {
       const counts = {};
       allData.forEach(item => {
@@ -617,15 +673,18 @@
             <strong style="color:var(--primary); font-size:0.85rem;">#${item.ticket}</strong>
             <div>
               <span class="badge badge-${(item.status || 'menunggu').toLowerCase()}">${item.status || 'Menunggu'}</span>
-              ${isGuruLoggedIn ? `<button class="btn-delete" onclick="hapusLaporan(${item.id})">🗑️ Hapus</button>` : ''}
+              ${isGuruLoggedIn ? `<button class="btn-action btn-delete" onclick="hapusLaporan(${item.id})">🗑️ Hapus</button>` : ''}
             </div>
           </div>
           <p style="font-size:0.9rem; color:var(--text-main); margin-bottom:8px;">${item.pesan}</p>
-          ${item.foto ? `<img src="${item.foto}" style="max-width:100%; max-height:160px; border-radius:10px; margin-bottom:8px; display:block;">` : ''}
-          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">
-            📂 ${item.kategori} | ⚡ ${item.urgensi} | 📅 ${item.tanggal || ''}
+          ${item.foto ? `<img src="${item.foto}" onclick="showFullFoto('${item.foto}')" style="max-width:100%; max-height:160px; border-radius:10px; margin-bottom:8px; display:block; cursor:pointer;" title="Klik untuk perbesar">` : ''}
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted);">
+            <span>📂 ${item.kategori} | ⚡ ${item.urgensi}</span>
+            <button class="btn-action btn-upvote" onclick="upvoteAspirasi(${item.id})">👍 ${item.upvotes || 0} Dukung</button>
           </div>
-          ${item.tanggapan ? `<div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; font-size:0.8rem; border-left:3px solid #10b981; margin-top:6px;"><strong>Respon Guru:</strong> ${item.tanggapan}</div>` : ''}
+
+          ${item.tanggapan ? `<div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; font-size:0.8rem; border-left:3px solid #10b981; margin-top:10px;"><strong>Respon Guru:</strong> ${item.tanggapan}</div>` : ''}
           
           ${isGuruLoggedIn ? `
             <div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--border-color);">
@@ -641,6 +700,12 @@
         `;
         listContainer.appendChild(card);
       });
+    }
+
+    // Upvote Laporan
+    async function upvoteAspirasi(id) {
+      await fetch(`/api/aspirasi/${id}/upvote`, { method: 'POST' });
+      fetchAspirasi();
     }
 
     // Submit Aspirasi Baru (Siswa)
