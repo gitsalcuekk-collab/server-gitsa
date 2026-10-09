@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "aspirasi-db",
-      "database_id": "GANTI_DENGAN_DATABASE_ID_KAMU"
+      "database_id": "wrangler d1 create my-db-name"
     }
   ]
 }
