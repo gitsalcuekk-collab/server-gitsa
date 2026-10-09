@@ -96,6 +96,27 @@ export default {
         await db.prepare("DELETE FROM agenda WHERE id=?").bind(Number(m[1])).run();
         return J({ success: true });
       }
+      if ((m = p.match(/^\/api\/agenda\/(\d+)$/)) && M === "PUT") {
+        if (!adm) return deny();
+        const b = await body(req), judul = t(b.judul, 120);
+        if (!judul || !/^\d{4}-\d{2}-\d{2}$/.test(b.tanggal || "")) return J({ success: false, message: "Judul dan tanggal wajib" }, 400);
+        const r = await db.prepare("UPDATE agenda SET judul=?, tanggal=?, tempat=? WHERE id=?").bind(judul, b.tanggal, t(b.tempat, 100), Number(m[1])).run();
+        return r.meta.changes ? J({ success: true }) : J({ success: false }, 404);
+      }
+      if (p === "/api/pengaturan" && M === "GET") {
+        try {
+          const { results } = await db.prepare("SELECT k,v FROM pengaturan").all();
+          return J(Object.fromEntries(results.map((r) => [r.k, r.v])));
+        } catch { return J({}); }
+      }
+      if (p === "/api/admin/pengaturan" && M === "POST") {
+        if (!adm) return deny();
+        const b = await body(req);
+        await db.prepare("CREATE TABLE IF NOT EXISTS pengaturan (k TEXT PRIMARY KEY, v TEXT)").run();
+        const st = db.prepare("INSERT INTO pengaturan (k,v) VALUES (?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v");
+        await db.batch([st.bind("hero_judul", t(b.hero_judul, 120)), st.bind("hero_teks", t(b.hero_teks, 500))]);
+        return J({ success: true });
+      }
       return J({ success: false, message: "Not found" }, 404);
     } catch (e) {
       console.error(e);
