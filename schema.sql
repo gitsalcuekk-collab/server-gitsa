@@ -1,22 +1,14 @@
-CREATE TABLE IF NOT EXISTS aspirasi (
-  id INTEGER PRIMARY KEY,
-  ticket TEXT NOT NULL,
-  kategori TEXT NOT NULL DEFAULT 'Umum',
-  urgensi TEXT NOT NULL DEFAULT 'Biasa',
-  pesan TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'Menunggu',
-  tanggapan TEXT NOT NULL DEFAULT '',
-  foto TEXT NOT NULL DEFAULT '',
-  upvotes INTEGER NOT NULL DEFAULT 0,
-  komentar TEXT NOT NULL DEFAULT '[]',
-  tanggal TEXT NOT NULL
+DROP TABLE IF EXISTS aspirasi;
+DROP TABLE IF EXISTS votes;
+DROP TABLE IF EXISTS agenda;
+CREATE TABLE aspirasi (
+  id INTEGER PRIMARY KEY, ticket TEXT, judul TEXT, kategori TEXT, uraian TEXT,
+  lokasi TEXT DEFAULT '', nama TEXT DEFAULT 'Siswa', kelas TEXT DEFAULT '',
+  anonim INTEGER DEFAULT 0, client_id TEXT, status TEXT DEFAULT 'Menunggu verifikasi',
+  tanggapan TEXT DEFAULT '', foto TEXT DEFAULT '', komentar TEXT DEFAULT '[]'
 );
-
-INSERT OR IGNORE INTO aspirasi
-  (id, ticket, kategori, urgensi, pesan, status, tanggapan, foto, upvotes, komentar, tanggal)
-VALUES
-  (1, 'ASP-101', 'Fasilitas Sekolah', 'Penting',
-   'Proyektor di kelas 11 RPL mati total saat jam pelajaran.',
-   'Diproses',
-   'Terima kasih, teknisi sarpras akan mengecek ke lokasi hari ini.',
-   '', 3, '["Tolong dikirim teknisi secepatnya ya pak."]', '2026-10-08');
+CREATE TABLE votes (aspirasi_id INTEGER, client_id TEXT, PRIMARY KEY (aspirasi_id, client_id));
+CREATE TABLE agenda (id INTEGER PRIMARY KEY, judul TEXT, tanggal TEXT, tempat TEXT);
+INSERT INTO agenda VALUES
+ (1,'Forum aspirasi bulanan OSIS','2026-10-23','Aula sekolah · 13.00 WIB'),
+ (2,'Pemeriksaan sarana lab komputer','2026-10-30','Lab Komputer 2 · bersama teknisi');
