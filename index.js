@@ -15,7 +15,9 @@ export default {
   async fetch(req, env) {
     const u = new URL(req.url), p = u.pathname, M = req.method, db = env.DB;
     if (!p.startsWith("/api/")) return env.ASSETS.fetch(req);
-    const adm = !!env.ADMIN_PIN && req.headers.get("x-admin-pin") === env.ADMIN_PIN;
+    const dec = (x) => { try { return decodeURIComponent(x || ""); } catch { return ""; } };
+    const adm = !!env.ADMIN_PIN && dec(req.headers.get("x-admin-pin")) === env.ADMIN_PIN &&
+      (!env.ADMIN_USER || dec(req.headers.get("x-admin-user")).toLowerCase() === String(env.ADMIN_USER).toLowerCase());
     const cid = u.searchParams.get("cid") || "";
     const deny = () => J({ success: false, message: "Khusus guru" }, 403);
     try {
