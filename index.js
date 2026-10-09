@@ -1,142 +1,136 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
+const MAX_FOTO = 1_500_000; // batas D1 per baris ~2 MB
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data.json');
+const json = (data, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+  });
 
-app.use(express.json({ limit: '15mb' }));
-app.use(express.urlencoded({ extended: true, limit: '15mb' }));
-app.use(express.static(__dirname));
+const toItem = (r) => ({ ...r, komentar: JSON.parse(r.komentar || "[]") });
 
-app.get('/', (req, res) => {
-  const htmlPath = path.join(__dirname, 'index.html');
-  if (fs.existsSync(htmlPath)) {
-    res.sendFile(htmlPath);
-  } else {
-    res.send('<h1>File index.html tidak ditemukan!</h1>');
+async function body(request) {
+  try {
+    return await request.json();
+  } catch {
+    return {};
   }
-});
+}
 
-function readData() {
-  if (!fs.existsSync(DATA_FILE)) {
-    const initialData = [
-      {
-        id: 1,
-        ticket: 'ASP-101',
-        kategori: 'Fasilitas Sekolah',
-        urgensi: 'Penting',
-        pesan: 'Proyektor di kelas 11 RPL mati total saat jam pelajaran.',
-        status: 'Diproses',
-        tanggapan: 'Terima kasih, teknisi sarpras akan mengecek ke lokasi hari ini.',
-        foto: '',
-        upvotes: 3,
-        komentar: ['Tolong dikirim teknisi secepatnya ya pak.'],
-        tanggal: '2026-10-08'
-      }
-    ];
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const { pathname } = url;
+    const method = request.method;
+    const db = env.DB;
+
+    if (!pathname.startsWith("/api/")) {
+      return env.ASSETS.fetch(request);
+    }
+
     try {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(initialData, null, 2));
-    } catch (e) {}
-    return initialData;
-  }
-  try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-  } catch (err) {
-    return [];
-  }
-}
+      // GET semua aspirasi
+      if (pathname === "/api/aspirasi" && method === "GET") {
+        const { results } = await db
+          .prepare("SELECT * FROM aspirasi ORDER BY id DESC")
+          .all();
+        return json(results.map(toItem));
+      }
 
-function writeData(data) {
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.error('Gagal menyimpan data:', err);
-  }
-}
+      // POST aspirasi baru
+      if (pathname === "/api/aspirasi" && method === "POST") {
+        const { kategori, urgensi, pesan, foto } = await body(request);
+        if (!pesan)
+          return json({ success: false, message: "Pesan wajib diisi" }, 400);
+        if (foto && foto.length > MAX_FOTO)
+          return json(
+            { success: false, message: "Foto terlalu besar, kompres dulu (maks ~1 MB)" },
+            413
+          );
 
-// Get All
-app.get('/api/aspirasi', (req, res) => {
-  res.json(readData());
-});
+        const item = {
+          id: Date.now(),
+          ticket: "ASP-" + Math.floor(100 + Math.random() * 900),
+          kategori: kategori || "Umum",
+          urgensi: urgensi || "Biasa",
+          pesan,
+          status: "Menunggu",
+          tanggapan: "",
+          foto: foto || "",
+          upvotes: 0,
+          komentar: [],
+          tanggal: new Date().toISOString().split("T")[0],
+        };
 
-// Post New
-app.post('/api/aspirasi', (req, res) => {
-  const { kategori, urgensi, pesan, foto } = req.body;
-  if (!pesan) return res.status(400).json({ success: false, message: 'Pesan wajib diisi' });
+        await db
+          .prepare(
+            `INSERT INTO aspirasi
+             (id, ticket, kategori, urgensi, pesan, status, tanggapan, foto, upvotes, komentar, tanggal)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+          )
+          .bind(
+            item.id, item.ticket, item.kategori, item.urgensi, item.pesan,
+            item.status, item.tanggapan, item.foto, item.upvotes, "[]", item.tanggal
+          )
+          .run();
 
-  const data = readData();
-  const newItem = {
-    id: Date.now(),
-    ticket: 'ASP-' + Math.floor(100 + Math.random() * 900),
-    kategori: kategori || 'Umum',
-    urgensi: urgensi || 'Biasa',
-    pesan,
-    status: 'Menunggu',
-    tanggapan: '',
-    foto: foto || '',
-    upvotes: 0,
-    komentar: [],
-    tanggal: new Date().toISOString().split('T')[0]
-  };
+        return json({ success: true, data: item });
+      }
 
-  data.unshift(newItem);
-  writeData(data);
-  res.json({ success: true, data: newItem });
-});
+      // Upvote
+      let m = pathname.match(/^\/api\/aspirasi\/(\d+)\/upvote$/);
+      if (m && method === "POST") {
+        const row = await db
+          .prepare("UPDATE aspirasi SET upvotes = upvotes + 1 WHERE id = ? RETURNING upvotes")
+          .bind(m[1])
+          .first();
+        if (!row) return json({ success: false }, 404);
+        return json({ success: true, upvotes: row.upvotes });
+      }
 
-// Upvote
-app.post('/api/aspirasi/:id/upvote', (req, res) => {
-  const data = readData();
-  const item = data.find(a => a.id == req.params.id);
-  if (item) {
-    item.upvotes = (item.upvotes || 0) + 1;
-    writeData(data);
-    res.json({ success: true, upvotes: item.upvotes });
-  } else {
-    res.status(404).json({ success: false });
-  }
-});
+      // Tambah komentar
+      m = pathname.match(/^\/api\/aspirasi\/(\d+)\/komentar$/);
+      if (m && method === "POST") {
+        const { teks } = await body(request);
+        const row = await db
+          .prepare("SELECT komentar FROM aspirasi WHERE id = ?")
+          .bind(m[1])
+          .first();
+        if (!row) return json({ success: false }, 404);
+        const list = JSON.parse(row.komentar || "[]");
+        list.push(teks);
+        await db
+          .prepare("UPDATE aspirasi SET komentar = ? WHERE id = ?")
+          .bind(JSON.stringify(list), m[1])
+          .run();
+        return json({ success: true });
+      }
 
-// Tambah Komentar
-app.post('/api/aspirasi/:id/komentar', (req, res) => {
-  const { teks } = req.body;
-  const data = readData();
-  const item = data.find(a => a.id == req.params.id);
-  if (item) {
-    if (!item.komentar) item.komentar = [];
-    item.komentar.push(teks);
-    writeData(data);
-    res.json({ success: true });
-  } else {
-    res.status(404).json({ success: false });
-  }
-});
+      // Tanggapi (guru/admin)
+      if (pathname === "/api/admin/tanggapi" && method === "POST") {
+        const { id, status, tanggapan } = await body(request);
+        const row = await db
+          .prepare("SELECT id FROM aspirasi WHERE id = ?")
+          .bind(id)
+          .first();
+        if (!row) return json({ success: false }, 404);
+        if (status)
+          await db.prepare("UPDATE aspirasi SET status = ? WHERE id = ?").bind(status, id).run();
+        if (tanggapan !== undefined)
+          await db.prepare("UPDATE aspirasi SET tanggapan = ? WHERE id = ?").bind(tanggapan, id).run();
+        return json({ success: true });
+      }
 
-// Tanggapi Guru
-app.post('/api/admin/tanggapi', (req, res) => {
-  const { id, status, tanggapan } = req.body;
-  const data = readData();
-  const item = data.find(a => a.id == id);
-  if (item) {
-    if (status) item.status = status;
-    if (tanggapan !== undefined) item.tanggapan = tanggapan;
-    writeData(data);
-    res.json({ success: true });
-  } else {
-    res.status(404).json({ success: false });
-  }
-});
+      // Hapus
+      m = pathname.match(/^\/api\/aspirasi\/(\d+)$/);
+      if (m && method === "DELETE") {
+        await db.prepare("DELETE FROM aspirasi WHERE id = ?").bind(m[1]).run();
+        return json({ success: true });
+      }
 
-// Delete Spam
-app.delete('/api/aspirasi/:id', (req, res) => {
-  let data = readData();
-  data = data.filter(a => a.id != req.params.id);
-  writeData(data);
-  res.json({ success: true });
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server aktif di port ${PORT}`);
-});
+      return json({ success: false, message: "Not found" }, 404);
+    } catch (err) {
+      console.error(err);
+      return json({ success: false, message: "Server error" }, 500);
+    }
+  },
+};
