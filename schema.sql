@@ -12,3 +12,4 @@ CREATE TABLE agenda (id INTEGER PRIMARY KEY, judul TEXT, tanggal TEXT, tempat TE
 INSERT INTO agenda VALUES
  (1,'Forum aspirasi bulanan OSIS','2026-10-23','Aula sekolah · 13.00 WIB'),
  (2,'Pemeriksaan sarana lab komputer','2026-10-30','Lab Komputer 2 · bersama teknisi');
+CREATE TABLE IF NOT EXISTS pengaturan (k TEXT PRIMARY KEY, v TEXT);
