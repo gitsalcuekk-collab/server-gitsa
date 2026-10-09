@@ -56,9 +56,10 @@ export default {
         const b = await body(req), id = Number(m[1]);
         if (!b.cid) return J({ success: false }, 400);
         if (!(await db.prepare("SELECT 1 x FROM aspirasi WHERE id=?").bind(id).first())) return J({ success: false }, 404);
-        const del = await db.prepare("DELETE FROM votes WHERE aspirasi_id=? AND client_id=?").bind(id, String(b.cid)).run();
-        const had = del.meta.changes > 0;
-        if (!had) await db.prepare("INSERT INTO votes VALUES (?,?)").bind(id, String(b.cid)).run();
+        const ex = await db.prepare("SELECT 1 x FROM votes WHERE aspirasi_id=? AND client_id=?").bind(id, String(b.cid)).first();
+        const had = !!ex;
+        if (had) await db.prepare("DELETE FROM votes WHERE aspirasi_id=? AND client_id=?").bind(id, String(b.cid)).run();
+        else await db.prepare("INSERT OR IGNORE INTO votes (aspirasi_id, client_id) VALUES (?,?)").bind(id, String(b.cid)).run();
         const c = await db.prepare("SELECT COUNT(*) n FROM votes WHERE aspirasi_id=?").bind(id).first();
         return J({ success: true, upvotes: c.n, voted: !had });
       }
@@ -120,7 +121,7 @@ export default {
       return J({ success: false, message: "Not found" }, 404);
     } catch (e) {
       console.error(e);
-      return J({ success: false, message: "Server error" }, 500);
+      return J({ success: false, message: "Server error: " + String((e && e.message) || e).slice(0, 140) }, 500);
     }
   },
 };
